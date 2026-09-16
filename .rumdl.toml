@@ -1,0 +1,20 @@
+[global]
+disable = ["MD041", "MD033", "MD074", "MD057", "MD052", "MD076", "MD028"]
+flavor = "mkdocs"
+
+[MD013]
+line-length = 100
+reflow = true
+reflow-mode = "normalize"
+code-blocks = false  # Don't check code blocks (default: true)
+tables = false  # Don't check tables (default: false)
+
+[MD060]
+enabled = true  # Default: opt-in for conservative adoption
+style = "aligned"  # Options: "aligned", "aligned-no-space", "compact", "tight", "any"
+
+[MD029]
+style = "one"  # Default - matches markdownlint behavior
+
+[MD004]
+style = "dash"  # Options: "consistent", "asterisk", "plus", "dash", "sublist"

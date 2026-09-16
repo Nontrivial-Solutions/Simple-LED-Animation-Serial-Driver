@@ -1,0 +1,108 @@
+name: Do quality check and release
+
+on:
+    pull_request:
+        branches: ["main"]
+
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: "Branch to release"
+                required: true
+                type: choice
+                default: main
+                options:
+                    - main
+                    # You can add more options here if you need to test on different SDK versions
+            do_release:
+                description: 'Create Release (must also select Tag above!")'
+                required: true
+                default: false
+                type: boolean
+
+            do_page:
+                description: "Publish to github pages"
+                required: true
+                default: false
+                type: boolean
+
+permissions:
+    pages: write
+    id-token: write
+    contents: write
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+                  fetch-depth: 0
+
+            - name: Check Nixpkgs inputs
+              uses: DeterminateSystems/flake-checker-action@main
+              with:
+                  fail-mode: true
+
+            - name: Install Nix
+              uses: DeterminateSystems/nix-installer-action@main
+
+            - name: Check
+              run: |
+                  nix develop --command \
+                      just check-release
+
+            - name: Test
+              run: |
+                  nix develop --command \
+                    just test
+
+            - name: Docs html
+              run: |
+                  nix develop --command \
+                    just html
+
+            - name: Upload artifact
+              if: inputs.do_page
+              uses: actions/upload-pages-artifact@v5
+              with:
+                  path: ./.build/docs
+
+            - name: Deploy to GitHub Pages
+              if: inputs.do_page
+              uses: actions/deploy-pages@v5
+
+            - name: Release
+              if: startsWith(github.ref, 'refs/tags/') && inputs.do_release
+              uses: softprops/action-gh-release@v2
+
+    publish:
+        if: startsWith(github.ref, 'refs/tags/') && inputs.do_release
+        needs: release
+        environment:
+            name: pypi
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+                  fetch-depth: 0
+
+            - name: Check Nixpkgs inputs
+              uses: DeterminateSystems/flake-checker-action@main
+              with:
+                  fail-mode: true
+
+            - name: Install Nix
+              uses: DeterminateSystems/nix-installer-action@main
+            - name: Build
+              run: |
+                  nix develop --command \
+                   uv build
+
+            # Check that basic features work and we didn't miss to include crucial files
+            - name: Publish
+              run: |
+                  nix develop --command \
+                   uv publish

@@ -1,0 +1,645 @@
+
+
+:root {
+
+  --md-default-bg-color--ultra-dark:#111217;
+
+  --md-admonition-icon--important:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 496C342.1 496 360 513.9 360 536C360 558.1 342.1 576 320 576C297.9 576 280 558.1 280 536C280 513.9 297.9 496 320 496zM320 64C346.5 64 368 85.5 368 112C368 112.6 368 113.1 368 113.7L352 417.7C351.1 434.7 337 448 320 448C303 448 289 434.7 288 417.7L272 113.7C272 113.1 272 112.6 272 112C272 85.5 293.5 64 320 64z"/></svg>');
+  --md-admonition-icon-color--important: hsl(191, 97%, 77%);
+  --md-admonition-bg-color--important: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--important: 0,116,217;
+  --md-admonition-light-bg--important: 0,116,217; 
+
+  --md-admonition-icon--sat:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M120 56c0-30.9 25.1-56 56-56l24 0c17.7 0 32 14.3 32 32l0 448c0 17.7-14.3 32-32 32l-32 0c-29.8 0-54.9-20.4-62-48-.7 0-1.3 0-2 0-44.2 0-80-35.8-80-80 0-18 6-34.6 16-48-19.4-14.6-32-37.8-32-64 0-30.9 17.6-57.8 43.2-71.1-7.1-12-11.2-26-11.2-40.9 0-44.2 35.8-80 80-80l0-24zm272 0l0 24c44.2 0 80 35.8 80 80 0 15-4.1 29-11.2 40.9 25.7 13.3 43.2 40.1 43.2 71.1 0 26.2-12.6 49.4-32 64 10 13.4 16 30 16 48 0 44.2-35.8 80-80 80-.7 0-1.3 0-2 0-7.1 27.6-32.2 48-62 48l-32 0c-17.7 0-32-14.3-32-32l0-448c0-17.7 14.3-32 32-32l24 0c30.9 0 56 25.1 56 56z"/></svg>');
+  --md-admonition-icon-color--sat: hsl(191, 97%, 77%);
+  --md-admonition-bg-color--sat: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--sat: 0,116,217;
+  --md-admonition-light-bg--sat: 0,116,217; 
+
+  --md-admonition-icon--under-construction:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M384 328L384 128C384 110.3 369.7 96 352 96L288 96C270.3 96 256 110.3 256 128L256 328C256 341.3 245.3 352 232 352C218.7 352 208 341.3 208 328L208 142.1C122 173.8 64 255.8 64 352L64 416L576 416L576 352C575 256.8 517.6 174.3 432 142.2L432 328C432 341.3 421.3 352 408 352C394.7 352 384 341.3 384 328zM72 464C49.9 464 32 481.9 32 504C32 526.1 49.9 544 72 544L568 544C590.1 544 608 526.1 608 504C608 481.9 590.1 464 568 464L72 464z"/></svg>');
+  --md-admonition-icon-color--under-construction: #ff5555; 
+  --md-admonition-bg-color--under-construction: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--under-construction:255, 65, 54;
+  --md-admonition-light-bg--under-construction: 255, 65, 54;
+
+  --md-admonition-icon--test-card: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M96 96C96 78.3 110.3 64 128 64L352 64C369.7 64 384 78.3 384 96C384 113.7 369.7 128 352 128L352 289.4C285.9 319.7 240 386.5 240 464C240 503.7 252 540.6 272.7 571.2C262.4 574.3 251.4 576 240 576C178.1 576 128 525.9 128 464L128 128C110.3 128 96 113.7 96 96zM192 128L192 256L288 256L288 128L192 128zM288 464C288 384.5 352.5 320 432 320C511.5 320 576 384.5 576 464C576 543.5 511.5 608 432 608C352.5 608 288 543.5 288 464zM489.4 403.1C482.3 397.9 472.2 399.5 467 406.6L414 479.5L387.2 452.7C381 446.5 370.8 446.5 364.6 452.7C358.4 458.9 358.4 469.1 364.6 475.3L404.6 515.3C407.9 518.6 412.5 520.3 417.2 519.9C421.9 519.5 426.1 517.1 428.9 513.4L492.9 425.4C498.1 418.3 496.5 408.2 489.4 403.1z"/></svg>');
+  --md-admonition-bg-color--test-card: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-icon-color--test-card: hsl(191, 97%, 77%);
+  --md-admonition-light-color--test-card: 57, 204, 204;
+  --md-admonition-light-bg--test-card: 57, 204, 204;
+  
+  --md-admonition-icon--requirement-card: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>receipt-text-check</title><path d="M18.25 22L15.5 19L16.66 17.82L18.25 19.41L21.84 15.82L23 17.23M19.5 3.5L18 2L16.5 3.5L15 2L13.5 3.5L12 2L10.5 3.5L9 2L7.5 3.5L6 2L4.5 3.5L3 2V22L4.5 20.5L6 22L7.5 20.5L9 22L10.5 20.5L12 22L13.26 20.74C13.09 20.18 13 19.59 13 19C13 18.32 13.12 17.64 13.34 17H6V15H14.53C15.67 13.73 17.29 13 19 13C19.68 13 20.36 13.12 21 13.34V2L19.5 3.5M18 13H6V11H18V13M18 9H6V7H18V9Z" /></svg>');
+  --md-admonition-icon-color--requirement-card: hsl(326, 100%, 74%);
+  --md-admonition-bg-color--requirement-card: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--requirement-card: 240, 18, 190;
+  --md-admonition-light-bg--requirement-card: 240, 18, 190;
+
+  --md-admonition-icon--proof:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M142 66.2C150.5 62.3 160.5 63.7 167.6 69.8L208 104.4L248.4 69.8C257.4 62.1 270.7 62.1 279.6 69.8L320 104.4L360.4 69.8C369.4 62.1 382.6 62.1 391.6 69.8L432 104.4L472.4 69.8C479.5 63.7 489.5 62.3 498 66.2C506.5 70.1 512 78.6 512 88L512 552C512 561.4 506.5 569.9 498 573.8C489.5 577.7 479.5 576.3 472.4 570.2L432 535.6L391.6 570.2C382.6 577.9 369.4 577.9 360.4 570.2L320 535.6L279.6 570.2C270.6 577.9 257.3 577.9 248.4 570.2L208 535.6L167.6 570.2C160.5 576.3 150.5 577.7 142 573.8C133.5 569.9 128 561.4 128 552L128 88C128 78.6 133.5 70.1 142 66.2zM232 200C218.7 200 208 210.7 208 224C208 237.3 218.7 248 232 248L408 248C421.3 248 432 237.3 432 224C432 210.7 421.3 200 408 200L232 200zM208 416C208 429.3 218.7 440 232 440L408 440C421.3 440 432 429.3 432 416C432 402.7 421.3 392 408 392L232 392C218.7 392 208 402.7 208 416zM232 296C218.7 296 208 306.7 208 320C208 333.3 218.7 344 232 344L408 344C421.3 344 432 333.3 432 320C432 306.7 421.3 296 408 296L232 296z"/></svg>');
+  --md-admonition-icon-color--proof: hsl(31, 100%, 74%);
+  --md-admonition-bg-color--proof: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--proof: 255, 133, 27;
+  --md-admonition-light-bg--proof: 255, 133, 27;
+
+  --md-admonition-icon--lemma:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M437.5 91.1C452.5 73.9 474.2 64 497.1 64C540.7 64 576.1 99.4 576.1 143C576.1 165.8 566.2 187.6 549 202.6L347.7 377.8L337 367L273 303L262.2 292.3L437.5 91.1zM225.1 323C226 324 252 350 303 401L316.9 414.9L299.8 489.1C295.9 506.2 282.9 519.8 266 524.5L96.2 572L188.5 479.7C189.7 479.8 190.8 479.9 192 479.9C209.7 479.9 224 465.6 224 447.9C224 430.2 209.7 415.9 192 415.9C174.3 415.9 160 430.2 160 447.9C160 449.1 160.1 450.3 160.2 451.4L67.9 543.8L115.5 374C120.2 357.1 133.8 344.1 150.9 340.2L225.1 323z"/></svg>');
+  --md-admonition-icon-color--lemma: hsl(65, 92%, 76%);
+  --md-admonition-bg-color--lemma: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-light-color--lemma: 255, 220, 0;
+  --md-admonition-light-bg--lemma: 255, 220, 0;
+
+  --md-admonition-icon--theorem:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M437.5 91.1C452.5 73.9 474.2 64 497.1 64C540.7 64 576.1 99.4 576.1 143C576.1 165.8 566.2 187.6 549 202.6L347.7 377.8L337 367L273 303L262.2 292.3L437.5 91.1zM225.1 323C226 324 252 350 303 401L316.9 414.9L299.8 489.1C295.9 506.2 282.9 519.8 266 524.5L96.2 572L188.5 479.7C189.7 479.8 190.8 479.9 192 479.9C209.7 479.9 224 465.6 224 447.9C224 430.2 209.7 415.9 192 415.9C174.3 415.9 160 430.2 160 447.9C160 449.1 160.1 450.3 160.2 451.4L67.9 543.8L115.5 374C120.2 357.1 133.8 344.1 150.9 340.2L225.1 323z"/></svg>');
+  --md-admonition-bg-color--theorem: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-icon-color--theorem: hsl(65, 92%, 76%);
+  --md-admonition-light-color--theorem: 255, 220, 0; 
+  --md-admonition-light-bg--theorem: 255, 220, 0;
+  
+  --md-admonition-light-color--definition: 61, 153, 112; 
+  --md-admonition-light-bg--definition: 61, 153, 112; 
+  --md-admonition-bg-color--definition: var(--md-default-bg-color--ultra-dark);
+  --md-admonition-icon--definition:url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M192 576L512 576C529.7 576 544 561.7 544 544C544 526.3 529.7 512 512 512L512 445.3C530.6 438.7 544 420.9 544 400L544 112C544 85.5 522.5 64 496 64L192 64C139 64 96 107 96 160L96 480C96 533 139 576 192 576zM160 480C160 462.3 174.3 448 192 448L448 448L448 512L192 512C174.3 512 160 497.7 160 480zM370.1 163.2C372.7 160.6 376.8 160.1 380 162.1C412.1 182.1 433.4 217.7 433.4 258.3C433.4 320.9 382.7 371.6 320.1 371.6C257.5 371.6 206.7 320.9 206.7 258.3C206.7 217.7 228.1 182.1 260.1 162.1C263.2 160.1 267.3 160.6 270 163.2C272.7 165.8 273.1 169.9 271.2 173C266 181.6 263 191.7 263 202.5C263 217.6 268.9 231.3 278.5 241.6C281 244.3 281.4 248.3 279.4 251.3C274.7 258.7 272 267.4 272 276.8C272 298.4 286.3 316.7 306 322.7L307 297.9C299.9 293.5 295.2 285.7 295.2 276.8C295.2 267.2 300.7 258.8 308.7 254.7L312 172.9C312.2 168.6 315.7 165.2 320 165.2C324.3 165.2 327.8 168.6 328 172.9L331.3 254.7C339.3 258.8 344.8 267.1 344.8 276.8C344.8 285.7 340.1 293.5 333 297.9L334 322.7C353.6 316.7 367.9 298.6 368 277.1L368 276.5C367.9 267.2 365.3 258.6 360.6 251.3C358.7 248.2 359 244.2 361.5 241.6C371.1 231.4 377 217.7 377 202.5C377 191.7 374 181.6 368.8 173C366.9 169.8 367.4 165.8 370 163.2z"/></svg>');
+  --md-admonition-icon-color--definition: hsl(135, 94%, 65%);
+ }
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+ 
+.md-typeset .admonition.important,
+.md-typeset details.important {
+  border-color: rgb(var(--md-admonition-light-color--important));
+}
+.md-typeset .important > .admonition-title,
+.md-typeset .important > summary {
+  background-color: rgba(var(--md-admonition-light-bg--important),0.1);
+  border-color: rgb(var(--md-admonition-light-color--important));
+}
+.md-typeset .important > .admonition-title::before,
+.md-typeset .important > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--important));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.important,
+[data-md-color-scheme="dracula"] .md-typeset details.important {
+  border-color: var(--md-admonition-icon-color--important);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.important
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.important
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.important > summary {
+  background-color: var(--md-admonition-bg-color--important);
+  border-color: var(--md-admonition-icon-color--important);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.important
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.important
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.important > summary::before {
+  background-color: var(--md-admonition-icon-color--important);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.important
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.important
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.important > summary::after {
+  color: var(--md-admonition-icon-color--important);
+}
+
+.md-typeset .important > .admonition-title::before,
+.md-typeset .important > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--important);
+  mask-image: var(--md-admonition-icon--important);
+}
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+ 
+.md-typeset .admonition.under-construction,
+.md-typeset details.under-construction {
+  border-color: rgb(var(--md-admonition-light-color--under-construction));
+}
+.md-typeset .under-construction > .admonition-title,
+.md-typeset .under-construction > summary {
+  background-color: rgba(var(--md-admonition-light-bg--under-construction),0.1);
+  border-color: rgb(var(--md-admonition-light-color--under-construction));
+}
+.md-typeset .under-construction > .admonition-title::before,
+.md-typeset .under-construction > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--under-construction));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.under-construction,
+[data-md-color-scheme="dracula"] .md-typeset details.under-construction {
+  border-color: var(--md-admonition-icon-color--under-construction);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.under-construction
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.under-construction
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.under-construction > summary {
+  background-color: var(--md-admonition-bg-color--under-construction);
+  border-color: var(--md-admonition-icon-color--under-construction);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.under-construction
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.under-construction
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.under-construction > summary::before {
+  background-color: var(--md-admonition-icon-color--under-construction);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.under-construction
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.under-construction
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.under-construction > summary::after {
+  color: var(--md-admonition-icon-color--under-construction);
+}
+
+.md-typeset .under-construction > .admonition-title::before,
+.md-typeset .under-construction > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--under-construction);
+  mask-image: var(--md-admonition-icon--under-construction);
+}
+
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+ 
+.md-typeset .admonition.test-card,
+.md-typeset details.test-card {
+  border-color: rgb(var(--md-admonition-light-color--test-card));
+}
+.md-typeset .test-card > .admonition-title,
+.md-typeset .test-card > summary {
+  background-color: rgba(var(--md-admonition-light-bg--test-card),0.1);
+  border-color: rgb(var(--md-admonition-light-color--test-card));
+}
+.md-typeset .test-card > .admonition-title::before,
+.md-typeset .test-card > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--test-card));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.test-card,
+[data-md-color-scheme="dracula"] .md-typeset details.test-card {
+  border-color: var(--md-admonition-icon-color--test-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.test-card
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.test-card
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.test-card > summary {
+  background-color: var(--md-admonition-bg-color--test-card);
+  border-color: var(--md-admonition-icon-color--test-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.test-card
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.test-card
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.test-card > summary::before {
+  background-color: var(--md-admonition-icon-color--test-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.test-card
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.test-card
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.test-card > summary::after {
+  color: var(--md-admonition-icon-color--test-card);
+}
+
+.md-typeset .test-card > .admonition-title::before,
+.md-typeset .test-card > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--test-card);
+  mask-image: var(--md-admonition-icon--test-card);
+}
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .admonition.requirement-card,
+.md-typeset details.requirement-card {
+  border-color: rgb(var(--md-admonition-light-color--requirement-card));
+}
+.md-typeset .requirement-card > .admonition-title,
+.md-typeset .requirement-card > summary {
+  background-color: rgba(var(--md-admonition-light-bg--requirement-card),0.1);
+  border-color: rgb(var(--md-admonition-light-color--requirement-card));
+}
+.md-typeset .requirement-card > .admonition-title::before,
+.md-typeset .requirement-card > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--requirement-card));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.requirement-card,
+[data-md-color-scheme="dracula"] .md-typeset details.requirement-card {
+  border-color: var(--md-admonition-icon-color--requirement-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.requirement-card
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.requirement-card
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.requirement-card > summary {
+  background-color: var(--md-admonition-bg-color--requirement-card);
+  border-color: var(--md-admonition-icon-color--requirement-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.requirement-card
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.requirement-card
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.requirement-card > summary::before {
+  background-color: var(--md-admonition-icon-color--requirement-card);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.requirement-card
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.requirement-card
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.requirement-card > summary::after {
+  color: var(--md-admonition-icon-color--requirement-card);
+}
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+.md-typeset .admonition.theorem,
+.md-typeset details.theorem {
+  border-color: rgb(var(--md-admonition-light-color--theorem));
+}
+.md-typeset .theorem > .admonition-title,
+.md-typeset .theorem > summary {
+  background-color: rgba(var(--md-admonition-light-bg--theorem),0.1);
+  border-color: rgb(var(--md-admonition-light-color--theorem));
+}
+.md-typeset .theorem > .admonition-title::before,
+.md-typeset .theorem > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--theorem));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.theorem,
+[data-md-color-scheme="dracula"] .md-typeset details.theorem {
+  border-color: var(--md-admonition-icon-color--theorem);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.theorem
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.theorem
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.theorem > summary {
+  background-color: var(--md-admonition-bg-color--theorem);
+  border-color: var(--md-admonition-icon-color--theorem);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.theorem
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.theorem
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.theorem > summary::before {
+  background-color: var(--md-admonition-icon-color--theorem);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.theorem
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.theorem
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.theorem > summary::after {
+  color: var(--md-admonition-icon-color--theorem);
+}
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .admonition.sat,
+.md-typeset details.sat {
+  border-color: rgb(var(--md-admonition-light-color--sat));
+}
+.md-typeset .sat > .admonition-title,
+.md-typeset .sat > summary {
+  background-color: rgba(var(--md-admonition-light-bg--sat),0.1);
+  border-color: rgb(var(--md-admonition-light-color--sat));
+}
+.md-typeset .sat > .admonition-title::before,
+.md-typeset .sat > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--sat));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.sat,
+[data-md-color-scheme="dracula"] .md-typeset details.sat {
+  border-color: var(--md-admonition-icon-color--sat);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.sat
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.sat
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.sat > summary {
+  background-color: var(--md-admonition-bg-color--sat);
+  border-color: var(--md-admonition-icon-color--sat);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.sat
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.sat
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.sat > summary::before {
+  background-color: var(--md-admonition-icon-color--sat);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.sat
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.sat
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.sat > summary::after {
+  color: var(--md-admonition-icon-color--sat);
+}
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .admonition.lemma,
+.md-typeset details.lemma {
+  border-color: rgb(var(--md-admonition-light-color--lemma));
+}
+.md-typeset .lemma > .admonition-title,
+.md-typeset .lemma > summary {
+  background-color: rgba(var(--md-admonition-light-bg--lemma),0.1);
+  border-color: rgb(var(--md-admonition-light-color--lemma));
+}
+.md-typeset .lemma > .admonition-title::before,
+.md-typeset .lemma > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--lemma));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.lemma,
+[data-md-color-scheme="dracula"] .md-typeset details.lemma {
+  border-color: var(--md-admonition-icon-color--lemma);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.lemma
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.lemma
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.lemma > summary {
+  background-color: var(--md-admonition-bg-color--lemma);
+  border-color: var(--md-admonition-icon-color--lemma);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.lemma
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.lemma
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.lemma > summary::before {
+  background-color: var(--md-admonition-icon-color--lemma);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.lemma
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.lemma
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.lemma > summary::after {
+  color: var(--md-admonition-icon-color--lemma);
+}
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .admonition.definition,
+.md-typeset details.definition {
+  border-color: rgb(var(--md-admonition-light-color--definition));
+}
+.md-typeset .definition > .admonition-title,
+.md-typeset .definition > summary {
+  background-color: rgba(var(--md-admonition-light-bg--definition),0.1);
+  border-color: rgb(var(--md-admonition-light-color--definition));
+}
+.md-typeset .definition > .admonition-title::before,
+.md-typeset .definition > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--definition));
+}
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.definition,
+[data-md-color-scheme="dracula"] .md-typeset details.definition {
+  border-color: var(--md-admonition-icon-color--definition);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.definition
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.definition
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.definition > summary {
+  background-color: var(--md-admonition-bg-color--definition);
+  border-color: var(--md-admonition-icon-color--definition);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.definition
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.definition
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.definition > summary::before {
+  background-color: var(--md-admonition-icon-color--definition);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.definition
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.definition
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.definition > summary::after {
+  color: var(--md-admonition-icon-color--definition);
+}
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .admonition.proof,
+.md-typeset details.proof {
+  border-color: rgb(var(--md-admonition-light-color--proof));
+}
+.md-typeset .proof > .admonition-title,
+.md-typeset .proof > summary {
+  background-color: rgba(var(--md-admonition-light-bg--proof),0.1);
+  border-color: rgb(var(--md-admonition-light-color--proof));
+}
+.md-typeset .proof > .admonition-title::before,
+.md-typeset .proof > summary::before {
+  background-color: rgb(var(--md-admonition-light-bg--proof));
+}
+
+
+[data-md-color-scheme="dracula"] .md-typeset .admonition.proof,
+[data-md-color-scheme="dracula"] .md-typeset details.proof {
+  border-color: var(--md-admonition-icon-color--proof);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.proof
+  > .admonition-title,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.proof
+  > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset details.proof > summary {
+  background-color: var(--md-admonition-bg-color--proof);
+  border-color: var(--md-admonition-icon-color--proof);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.proof
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.proof
+  > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset details.proof > summary::before {
+  background-color: var(--md-admonition-icon-color--proof);
+}
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  .admonition.proof
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"]
+  .md-typeset
+  details.proof
+  > .admonition-title::after,
+[data-md-color-scheme="dracula"] .md-typeset details.proof > summary::after {
+  color: var(--md-admonition-icon-color--proof);
+}
+
+
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
+.md-typeset .sat > .admonition-title::before,
+.md-typeset .sat  > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--sat);
+          mask-image: var(--md-admonition-icon--sat);
+}
+
+
+.md-typeset .proof > .admonition-title::before,
+.md-typeset .proof > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--proof);
+          mask-image: var(--md-admonition-icon--proof);
+}
+
+.md-typeset .requirement-card > .admonition-title::before,
+.md-typeset .requirement-card > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--requirement-card);
+          mask-image: var(--md-admonition-icon--requirement-card);
+}
+
+.md-typeset .definition > .admonition-title::before,
+.md-typeset .definition > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--definition);
+          mask-image: var(--md-admonition-icon--definition);
+}
+
+.md-typeset .lemma > .admonition-title::before,
+.md-typeset .lemma > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--lemma);
+          mask-image: var(--md-admonition-icon--lemma);
+}
+
+.md-typeset .theorem > .admonition-title::before,
+.md-typeset .theorem > summary::before {
+  -webkit-mask-image: var(--md-admonition-icon--theorem);
+          mask-image: var(--md-admonition-icon--theorem);
+}

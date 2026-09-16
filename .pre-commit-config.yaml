@@ -1,0 +1,44 @@
+repos:
+    - repo: local
+      hooks:
+          - id: ruff_check
+            name: ruff check
+            language: system
+            entry: ruff check
+            exclude:
+                glob:
+                    - "libraries/**/*.*"
+            files:
+                glob:
+                    - "fastrakSerialDriver/**/*.py"
+
+          - id: ruff_format
+            name: ruff format
+            language: system
+            entry: ruff format --check
+            exclude:
+                glob:
+                    - "libraries/**/*.*"
+            files:
+                glob:
+                    - "fastrakSerialDriver/**/*.py"
+          - id: tombi
+            name: tombi
+            language: system
+            entry: tombi format --check
+            exclude:
+                glob:
+                    - ".github/**/*.*"
+            files:
+                glob:
+                    - "**/*.toml"
+          - id: docs
+            name: docs
+            language: system
+            entry: rumdl check
+            exclude:
+                glob:
+                    - ".github/**/*.*"
+            files:
+                glob:
+                    - "**/*.md"

@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Launch",
+            "module": "",
+            "args": []
+        },
+        {
+            "name": "Debug Current Test File",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["${file}"],
+            "console": "integratedTerminal"
+        }
+    ]
+}

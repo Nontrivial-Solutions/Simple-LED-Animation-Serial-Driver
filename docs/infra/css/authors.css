@@ -1,0 +1,25 @@
+
+
+
+:root {
+    --md-default-bg-color--ultra-dark:#111217;
+ }
+
+
+
+[data-md-color-scheme="dracula"] .author-card > div{
+    background-color:var(--md-default-bg-color--ultra-dark);
+    border-radius: 1em;
+    box-shadow: 0 0.2rem 0.5rem hsla(0, 0%, 0%, 0.3), 0 0 0.05rem hsla(0, 0%, 0%, 0.2);
+    padding-left: 1em;
+    padding-right: 1em;
+
+}
+
+.author-image{
+    width:5em !important;
+}
+
+.author-socials{
+margin-bottom:1em !important;
+}

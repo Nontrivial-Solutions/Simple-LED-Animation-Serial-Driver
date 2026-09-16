@@ -1,0 +1,118 @@
+[project]
+name = "SLASD"
+description = """A serial driver and arduino project for 'animating' on a simple LED string.
+        """
+readme = "docs/README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pyserial>=3.5",
+]
+dynamic = ["version"]  # Remove any static version = "..." line
+
+[dependency-groups]
+dev = [
+  "cairosvg>=2.9.0",
+  "fake-bpy-module>=20260501",
+  "griffe-typingdoc>=0.3.1",
+  "markdown-gfm-admonition @ git+https://github.com/Joecstarr/markdown-gfm-admonition",
+  "markdown-include-variants>=0.0.8",
+  "mdx-include>=1.4.2",
+  "mkdocs-api-autonav>=0.4.0",
+  "mkdocs-author-plugin @ git+https://github.com/Joecstarr/mkdocs-author-plugin",
+  "mkdocs-auto-refresh-build-pages>=1.0.3",
+  "mkdocs-autorefs>=1.4.4",
+  "mkdocs-bibtex @ git+https://github.com/Joecstarr/mkdocs-bibtex",
+  "mkdocs-include-dir-to-nav @ git+https://github.com/Joecstarr/mkdocs_include_dir_to_nav",
+  "mkdocs-macros-plugin>=1.5.0",
+  "mkdocs-material>=9.7.6",
+  "mkdocs-monorepo-plugin>=1.1.2",
+  "mkdocs-redirects>=1.2.3",
+  "mkdocstrings[python]>=1.0.4",
+  "mkdoxy>=1.2.8",
+  "parametrize-from-file>=0.20.0",
+  "pymdown-extensions>=10.21.2",
+  "pyserial-mock>=1.0.0",
+  "pytest>=9.0.3",
+  "pytest-html>=4.2.0",
+  "pytest-mock>=3.15.1",
+  "pytest-reportlog>=1.0.0",
+  "reloadserver>=1.0.0",
+  "ty>=0.0.34",
+]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.targets.wheel]
+packages = ["slasd"]
+ignore-vcs = true
+
+[tool.pytest.ini_options]
+addopts = [
+  "--import-mode=importlib",
+]
+pythonpath = [".", "slasd"]
+
+[tool.ruff]
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # pyupgrade
+  "UP",
+  # flake8-bugbear
+  "B",
+  # flake8-simplify
+  "SIM",
+  # isort
+  "I",
+  # pydocstyle
+  "D"
+]
+ignore = [
+  "UP022",
+  "D211",
+  "D203",
+  "D213",
+  "D413",
+  "E111",
+  "W191",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "E501",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.uv.sources]
+mkdocs-bibtex = { git = "https://github.com/Joecstarr/mkdocs-bibtex" }
+mkdocs-author-plugin = { git = "https://github.com/Joecstarr/mkdocs-author-plugin" }
+markdown-gfm-admonition = { git = "https://github.com/Joecstarr/markdown-gfm-admonition" }
+mkdocs-include-dir-to-nav = { git = "https://github.com/Joecstarr/mkdocs_include_dir_to_nav" }
+
+[tool.uv-dynamic-versioning]
+style = "semver"  # also "semver" or "pvp"
+pattern = "default"  # "default" requires a "v" prefix; "default-unprefixed" drops it
+
+[lint]
+line-length = 100

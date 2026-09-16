@@ -1,0 +1,14 @@
+joe_starr: # author key
+    name: Joe Starr, Ph.D.
+    bio: I specialize in computational knot theory. I’m also a professional embedded software engineer.
+    socials:
+        - name: GitHub
+          link: https://github.com/Joecstarr
+          icon: fa-brands fa-github
+        - name: Website
+          link: https://joe-starr.com
+          icon: fa-solid fa-link
+        - name: Linkedin
+          link: https://www.linkedin.com/in/joseph-c-starr/
+          icon: fa-brands fa-linkedin
+    img: https://joe-starr.com/_astro/avatar.BCYTbMWl_Z1LXOOP.webp
