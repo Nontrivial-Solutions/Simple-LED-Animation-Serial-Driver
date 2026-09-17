@@ -28,6 +28,10 @@
           uv
           wget
           rumdl
+          jinja-lsp
+          ty
+          ruff
+          arduino-cli
         ];
 
         TODO_DIR = "./.todo/";

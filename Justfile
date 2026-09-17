@@ -5,6 +5,8 @@ set export
 
 # Set up development environment
 bootstrap:
+    arduino-cli core install arduino:avr
+    arduino-cli lib install FastLED
     if test ! -e .venv; then \
       git submodule deinit -f . ;\
       git submodule update --init --recursive ; \
