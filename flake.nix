@@ -32,6 +32,9 @@
           ty
           ruff
           arduino-cli
+          arduino-language-server
+          clang-tools
+          uncrustify
         ];
 
         TODO_DIR = "./.todo/";
