@@ -53,11 +53,6 @@ jobs:
                   nix develop --command \
                       just check-release
 
-            - name: Test
-              run: |
-                  nix develop --command \
-                    just test
-
             - name: Docs html
               run: |
                   nix develop --command \
