@@ -21,6 +21,7 @@ dev = [
   "mkdocs-author-plugin @ git+https://github.com/Joecstarr/mkdocs-author-plugin",
   "mkdocs-auto-refresh-build-pages>=1.0.3",
   "mkdocs-autorefs>=1.4.4",
+  "mkdocs-awesome-nav>=3.3.0",
   "mkdocs-bibtex @ git+https://github.com/Joecstarr/mkdocs-bibtex",
   "mkdocs-include-dir-to-nav @ git+https://github.com/Joecstarr/mkdocs_include_dir_to_nav",
   "mkdocs-macros-plugin>=1.5.0",

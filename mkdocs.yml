@@ -1,6 +1,6 @@
 site_name: Simple LED Animation Serial Driver
 site_description: >
-    A simple LED animation serial driver. 
+    A simple LED animation serial driver.
 columns:
 site_url: https://slasd.nontrivialsolutions.com/
 theme:
@@ -32,8 +32,8 @@ theme:
         - toc.follow
         - navigation.top
         - content.code.copy
-repo_name: Nontrivial-Solutions/fastrak-serial-driver
-repo_url: https://github.com/Nontrivial-Solutions/fastrak-serial-driver
+repo_name: Nontrivial-Solutions/Simple-LED-Animation-Serial-Driver
+repo_url: https://github.com/Nontrivial-Solutions/Simple-LED-Animation-Serial-Driver
 extra_css:
     - https://unpkg.com/katex@0/dist/katex.min.css
     - "infra/css/colors.css"
