@@ -1,5 +1,5 @@
 ---
-title: Polhemus Fastrak Serial Driver
+title: Simple Arduino Controlled LED Serial Driver
 authors:
   - joe_starr
 ---
@@ -7,20 +7,22 @@ authors:
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![White Logo image](https://brainmade.org/white-logo.svg){width=10%}](https://brainmade.org)
 
-![hero](./infra/assets/logo.svg){width=40%}
+![hero](./infra/assets/logo.svg)
 
 /// caption
-
+Arduino Mega from `amperka/hardware-drawings` [@amperka_hardware_drawings_2016]
 ///
 
 ## Note to Reader
 
 ### What Am I?
 
-This repository contains an opinionated python serial driver for the
-[Polhemus Fastrak](https://polhemus.com/all-trackers/fastrak). In this context opinionated means
-initializes the Fastrak for a specific use case. We however supply interfaces for all serial
-commands for the Fastrak.
+This repository contains an Arduino sketch which uses the FastLED library to control a collection
+(strip) of NEOPIXEL LED. The repository also contains a Python serial driver for commanding the
+Arduino. The python side is primarily designed around controlling the LED array based on feedback
+from a [Polhemus Fastrak](https://polhemus.com/all-trackers/fastrak).
+
+Simple installation by pip. You should probably be using uv projects: `uv add SLASD`
 
 ### About the Documentation
 
@@ -100,11 +102,9 @@ Files and directories shall be lower case, where capital is not required by a to
 │   │   └── 📁 usecase
 │   ├── 📁 infra
 │   └── 📖 README.md
-├── 📁 fastrakSerialDriver
-│   └── 🐍 __init__.py
-├── 📁 test 
-│   ├── 🐍 test_<unit>.py 
-│   ├── 🐍 conftest.py
+├── 📁 arduino_src 
+│   └── 🇨 arduino_src.ino
+├── 📁 slasd 
 │   └── 🐍 __init__.py
 ├── ⚙️ .editorconfig
 ├── 🙈 .gitignore
@@ -122,8 +122,8 @@ Files and directories shall be lower case, where capital is not required by a to
 ### Directories of Interest
 
 - docs: This directory contains the high level documentation for the tool.
-- src: This directory contains the source code of the tool.
-- test: This directory contains the test code of the tool.
+- arduino_src: This directory contains the source code of the Arduino side of the tool.
+- slasd: This directory contains the source code of the python side of the tool.
 - .github: This directory contains the GitHub infrastructure.  
 - .vscode: This directory contains the debugger configuration.  
 
@@ -138,7 +138,8 @@ must be detectable. A segfault is okay, an off by one error that computes the wr
 
 #### Unit Testing
 
-Each internal unit shall have a unit test suite.
+No unit testing in the project only integration testing. See
+[ADR00002][./content/madr/00002_testing.md].
 
 #### Integration Testing
 
@@ -148,43 +149,34 @@ The plugin shall have manual integration testing.
 
 #### Use Cases
 
-Requirements are described as a collection of [use cases](./content/usecase/usecase/) and
-[actors](./content/usecase/actors/) which are collected into the following use case diagram:
+Requirements are described as a collection of use cases and actors. There are two collections of the
+artifacts one for the [client](./content/arduino_src/usecase/) and one for the
+[server](./content/python_driver/usecase/usecase/). These are in turn collected into the following
+use case diagrams:
+
+##### Client
+
+```mermaid
+flowchart LR
+  aS["👤  Server"]
+
+  SS(["Set State"])
+  RC(["Receive Command"])
+
+  aS --> RC
+
+  RC -. include .->SS
+```
+
+##### Server
 
 ```mermaid
 flowchart LR
   aU["👤 User"]
-  aT["👤 Time"]
 
   SC(["Send Command"])
-  SRR(["Receive Response"])
-  SR(["Start Recording"])
-  ER(["End Recording"])
-  GP(["Get Position"])
-  CB(["Clear Data Buffer"])
-  B(["Boresight"])
-  GSR(["Get Single Record"])
-  I(["Initialize Device"])
-  PD(["Poll Data"])
 
   aU --> SC
-  aU --> SRR 
-  aU --> SR 
-  aU --> ER 
-  aU --> B 
-  aU -->  I 
-  aU --> GSR 
-  aU --> GP 
-  aU --> CB 
-  aT --> PD 
-
-  SR -. include .->SC
-  PD -. include .-> GP
-  SR -. include .->B
-  SR -. include .->I
-  ER -. include .->SC
-  GSR -. include .->SRR
-  GSR -. include .->SC
 ```
 
 ##### Architectural Decisions
@@ -250,89 +242,60 @@ using the included style settings.
 
 ```mermaid
 flowchart LR
-    device["FastrakDevice"]
-    cwr@{ shape: processes, label: "{{Collection}}<br>Commands with response" }
-    cwor@{ shape: processes, label: "{{Collection}}<br>Commands without response" }
+    device["BaseLedAnimator"]
+    cwr@{ shape: processes, label: "{{Collection}}<br>Device specific animators" }
+    commands@{ shape: processes, label: "{{Collection}}<br>Available Commands" }
 
-    device--> cwr
-    device --> cwor 
+    device --> cwr
+    device --> commands 
 ```
 
 #### Class Diagram
 
 ```mermaid
 classDiagram
-
-    FastrakDevice o-- SerialCommandsWithResp
-    FastrakDevice o-- SerialCommands
-    FastrakDevice o-- Support 
-    FastrakDevice *-- PollStream 
-    FastrakDevice o-- FastrakPosition 
-    PollStream o-- Command
-
-    SerialCommandsWithResp o-- Support 
-    SerialCommands o-- Support 
-
-    CommandWithResponse --|> Command
-    CommandWithResponse <|.. SerialCommandsWithResp
-    Command <|.. SerialCommands
-
-    class FastrakPosition{
-        + void parseValidPosition(dataPacket)
-        + float  x
-        + float  y
-        + float  z
-        + float  psi
-        + float  theta
-        + float  phi
+    class LedAnimationDevice {
+        + init( COMport, baud, timeout, ledCount) 
+        + connect() 
+        + compNSndState( **kwargs) 
+        - sendState( data) 
+        - computeState( **kwargs) 
     }
 
-    class PollStream{
-        + void __init__(baudrate,station,timeout,setup)
-        + void stop()
-        + void run()
-        + void clearBuffer()
-        + bytes data 
-        + FastrakPosition lastPosition 
-        - serial ser
-        - Thread thread
+    class FastrakAnimationDevice {
+        - computeState( **kwargs) 
     }
 
-    class FastrakDevice{
-        + void __init__(baudrate,station,timeout,setup)
-        + void connect()
-        + void enableStream()
-        + void disableStream()
-        + void readLine()
-        + void boresight()
-        + void basicSetup()
-        + void clearBuffer()
-        + void create_valid_device()
-        + bytes data 
-        + FastrakPosition lastPosition 
-        - serial ser
-        - bool isBinary
-        - FastrakStation station
-        - bool running
-        - PollStream thread
-        - baudrate baud
+    class FastrakParams {
+        + FastrakPostion posData
+        + int angleToLight
+        + int colorR
+        + int colorG
+        + int colorB
     }
 
-    class Command{<<interface>>}
-    class CommandWithResponse{<<interface>>}
-    class Support{<<collection>>}
-    class SerialCommands{<<collection>>}
-    class SerialCommandsWithResp{<<collection>>}
 
-    note for Support "A collection of enum and data supporting classes."
-    note for SerialCommands "A collection of serial commands for the Fastrak."
-    note for SerialCommandsWithResp "A collection of serial commands with a response for the Fastrak."
+    class SetLedState {
+        + init(self, data) 
+    }
+    
+    class SerialCommand {
+        <<interface>>
+        - str commandId
+        - bytearray payload
+        + send(ser) 
+    }
 
+    SetLedState ..|> SerialCommand
+
+    FastrakAnimationDevice --|> LedAnimationDevice
+
+    FastrakParams --* FastrakAnimationDevice 
+    SetLedState --* LedAnimationDevice 
 
 ```
 
 #### Unit Designs
 
-Unit designs (and test description) for the FastrakDevice and FastrakPosition unit (public members
-and methods) is found under [Unit Designs](./content/units). Designs for other units (commands and
-supporting classes) are omitted.
+Unit designs (and test description) for the client and server units (public members and methods) is
+found under their respective documentation sections.
