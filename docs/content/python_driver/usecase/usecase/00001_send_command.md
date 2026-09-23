@@ -1,17 +1,17 @@
 ---
-title: 00002 Wait for Response 
+title: 00001 Send Command
 authors:
   - joe_starr
-status: low
+status: high
 ---
 
 ## Goals
 
-The use case models a wait for a response from a Fastrak.  
+The use case models the sending of a single command to a LED array.  
 
 ### Happy Outcome
 
-When the use case completes successfully a response is received from the Fastrak.
+When the use case completes successfully a command is issued to the LED array.  
 
 ### Sad Outcome
 
@@ -27,13 +27,12 @@ When the use case completes unsuccessfully a failure is handled.
 
 ## Trigger
 
-A user waits for a response from the Fastrak.  
+A user sends a serial command to the device.
 
 ## Scenario
 
 1. The serial device is verified
-1. Wait for the Fastrak to send a response.  
-1. Report response
+1. The serial command is sent
 1. An error occurs:
     1. Set error state
     1. Report a disconnect error

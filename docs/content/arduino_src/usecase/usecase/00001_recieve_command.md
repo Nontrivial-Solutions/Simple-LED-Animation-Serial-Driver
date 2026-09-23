@@ -1,5 +1,5 @@
 ---
-title: 00001 Send Command
+title: 00001 Get Command
 authors:
   - joe_starr
 status: high
@@ -7,11 +7,11 @@ status: high
 
 ## Goals
 
-The use case models the sending of a single command to a Fastrak.  
+The use case models the receipt of a single serial command.
 
 ### Happy Outcome
 
-When the use case completes successfully a command is issued to the Fastrak.  
+When the use case completes successfully a command is processed by the serial client.  
 
 ### Sad Outcome
 
@@ -23,16 +23,16 @@ When the use case completes unsuccessfully a failure is handled.
 
 ## Actors
 
-- [User](../actors/00001_user.md)
+- [Server](../actors/00001_server.md)
 
 ## Trigger
 
-A user sends a serial command to the device.
+A server sends a serial command to the device.
 
 ## Scenario
 
 1. The serial device is verified
-1. The serial command is sent
+1. The serial command is processed
 1. An error occurs:
     1. Set error state
     1. Report a disconnect error
