@@ -51,7 +51,6 @@ extra_javascript:
 watch:
     - docs
     - slasd
-    - test
 
 plugins:
     - search:

@@ -5,6 +5,7 @@ description = """A serial driver and arduino project for 'animating' on a simple
 readme = "docs/README.md"
 requires-python = ">=3.10"
 dependencies = [
+  "fastrakserialdriver>=0.2.1",
   "pyserial>=3.5",
 ]
 dynamic = ["version"]  # Remove any static version = "..." line
@@ -12,7 +13,6 @@ dynamic = ["version"]  # Remove any static version = "..." line
 [dependency-groups]
 dev = [
   "cairosvg>=2.9.0",
-  "fake-bpy-module>=20260501",
   "griffe-typingdoc>=0.3.1",
   "markdown-gfm-admonition @ git+https://github.com/Joecstarr/markdown-gfm-admonition",
   "markdown-include-variants>=0.0.8",
