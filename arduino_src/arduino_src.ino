@@ -1,108 +1,219 @@
-/*
-  Serial Event example
+/**
+ * \file arduino_src.ino
+ * \brief Arduino project for basic control of a string of LED.
+ */
 
-  When new serial data arrives, this sketch adds it to a String.
-  When a newline is received, the loop prints the string and clears it.
-
-  A good test for this is to try it with a GPS receiver that sends out
-  NMEA 0183 sentences.
-
-  NOTE: The serialEvent() feature is not available on the Leonardo, Micro, or
-  other ATmega32U4 based boards.
-
-  created 9 May 2011
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/SerialEvent
-*/
 
 #include "FastLED.h"
-#define NUM_LEDS 1680
+
+/*************************************************************************************************/
+/************************** Defines **************************************************************/
+/*************************************************************************************************/
+
+
+/**
+ * \brief The size the LED array. Bounded by memory size of the uc in relation to serial buffer
+ *needs.
+ */
+#define MAX_NUM_LEDS 1200
+
+/**
+ * \brief The size the serial buffer array. Bounded by memory size of the uc.
+ */
+#define MAX_SERIAL_BUFFER ((3 * MAX_NUM_LEDS) + 2)
+
+/**
+ * \brief Physical pin the LED are connected to.
+ */
 #define DATA_PIN 6
 
-CRGB leds[NUM_LEDS];
+/*************************************************************************************************/
+/************************** Private Function Declarations ****************************************/
+/*************************************************************************************************/
 
-String inputString = "";         // a String to hold incoming data
-bool stringComplete = false;  // whether the string is complete
+uint8_t set_led_state_cmd(uint8_t *buff, size_t count);
+uint8_t set_led_off_cmd(uint8_t *buff, size_t count);
+bool cmd_check_charset(const char *valid_chars, const char str_char);
+void log(char *msg);
+
+/*************************************************************************************************/
+/*************************************************************************************************/
+/*************************************************************************************************/
+
+/**
+ * \typedef cmd_handler_funptr_t
+ * \brief Function pointer type for a command handler callback function.
+ */
+typedef uint8_t (*cmd_handler_funptr_t)(uint8_t *buff, size_t count);
+
+/**
+ * \struct cmd_dic_t
+ * \brief The storage type for a serial command.
+ *
+ */
+typedef struct cmd_dic_t {
+  char *char_class;            /**< The class of char that indicate a command.*/
+  cmd_handler_funptr_t funptr; /**< The callback used to process the command.*/
+} cmd_dic_t;
+
+/*************************************************************************************************/
+/************************** Local Variables ******************************************************/
+/*************************************************************************************************/
+
+/**
+ * \brief The collection of LED objects.
+ */
+CRGB leds[MAX_NUM_LEDS];
+
+/**
+ * \brief The serial buffer.
+ */
+uint8_t serial_buffer[MAX_SERIAL_BUFFER];
+
+
+/**
+ * \brief The state command template.
+ */
+cmd_dic_t setState = { "Ss", &set_led_state_cmd };
+
+/**
+ * \brief The off command template.
+ */
+cmd_dic_t setOff = { "oO", &set_led_off_cmd };
+
+/**
+ * \brief The collection of commands. Must be NULL terminated.
+ */
+const cmd_dic_t *charcheck_dict[] = { &setState, &setOff, NULL };
+
+/*************************************************************************************************/
+/************************** Primary Arduino Event Loop *******************************************/
+/*************************************************************************************************/
 
 void setup() {
-  // initialize serial:
+  /* initialize serial: */
   Serial.begin(115200);
-  // reserve 200 bytes for the inputString:
-  inputString.reserve(200);
-
-  // setup LED array
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  FastLED.addLeds< NEOPIXEL, DATA_PIN >(leds, MAX_NUM_LEDS);
 }
 
 void loop() {
-  // print the string when a newline arrives:
-  if (stringComplete) {
+  FastLED.show();
+}
 
-    String LEDdec = getValue(inputString, ' ', 0);
-    String LEDval = getValue(inputString, ' ', 1);
-    int LEDvalInt = LEDval.toInt();
-    String RGBdec = getValue(inputString, ' ', 2);
-    String Rval = getValue(inputString, ' ', 3);
-    String Gval = getValue(inputString, ' ', 4);
-    String Bval = getValue(inputString, ' ', 5);
-    
-    int RvalInt = Rval.toInt();
-    int GvalInt = Gval.toInt();
-    int BvalInt = Bval.toInt();
+void clearBuffer() {
+  size_t i;
 
-    //Serial.println(LEDdec);
-    //Serial.println(LEDval);
-    //Serial.println(RGBdec);
-    //Serial.println(Rval);
-    //Serial.println(Gval);
-    //Serial.println(Bval);
-
-    leds[LEDvalInt].r = RvalInt;
-    leds[LEDvalInt].g = GvalInt;
-    leds[LEDvalInt].b = BvalInt;
-    FastLED.show();
-    delay(30);
-
-    // clear the string:
-    inputString = "";
-    stringComplete = false;
+  for (i = 0; i < MAX_SERIAL_BUFFER - 1; i++) {
+    serial_buffer[i] = '\0';
   }
 }
 
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
 void serialEvent() {
-  while (Serial.available()) {
-    // get the new byte:
-    char inChar = (char)Serial.read();
-    // add it to the inputString:
-    inputString += inChar;
-    // if the incoming character is a newline, set a flag so the main loop can
-    // do something about it:
-    if (inChar == '\n') {
-      stringComplete = true;
+  /*Initialize the character checking dictionary*/
+  const cmd_dic_t *dic_p;
+
+  if (Serial.available()) {
+    size_t inCnt =
+      (size_t)Serial.readBytes(serial_buffer, MAX_SERIAL_BUFFER - 1);
+
+    if (inCnt == 0) {
+      log("ERROR: Issue with reading bytes from serial");
+    }
+
+    if (serial_buffer[inCnt] != '\n') {
+      log("ERROR: Issue with reading bytes from serial");
+    }
+
+    serial_buffer[inCnt] = '\0';
+    for (dic_p = charcheck_dict[0]; dic_p != NULL; dic_p++) {
+      if (cmd_check_charset(dic_p->char_class, serial_buffer[0])) {
+        (void)dic_p->funptr(serial_buffer, inCnt);
+        break;
+      }
+    }
+    if (dic_p == NULL) {
+      log("ERROR: Issue with processing command from serial.");
     }
   }
+  clearBuffer();
 }
 
-String getValue(String data, char separator, int index)
-{
-  int found = 0;
-  int strIndex[] = { 0, -1 };
-  int maxIndex = data.length() - 1;
+/*************************************************************************************************/
+/************************** Private Function Definitions *****************************************/
+/*************************************************************************************************/
 
-  for (int i = 0; i <= maxIndex && found <= index; i++) {
-    if (data.charAt(i) == separator || i == maxIndex) {
-      found++;
-      strIndex[0] = strIndex[1] + 1;
-      strIndex[1] = (i == maxIndex) ? i + 1 : i;
+/**
+ * \brief Callback function for the state command.
+ *
+ * \param buff buffer to process.
+ * \param count Number of bytes in the buffer.
+ * \return not used
+ */
+uint8_t set_led_state_cmd(uint8_t *buff, size_t count) {
+  if ((count <= 2) || ((count - 2) % 3)) {
+    log("ERROR: Issue with state command");
+  } else {
+    size_t i;
+    buff++;
+    count -= 2;
+
+    for (i = 0; i * 3 < count; i++) {
+      leds[i].r = buff[i * 3];
+      leds[i].g = buff[i * 3 + 1];
+      leds[i].b = buff[i * 3 + 2];
+    }
+    for (; i < MAX_NUM_LEDS; i++) {
+      leds[i].r = 0;
+      leds[i].g = 0;
+      leds[i].b = 0;
     }
   }
-  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+  return 0;
+}
+
+/**
+ * \brief Callback function for the state command.
+ *
+ * \param buff buffer to process.
+ * \param count Number of bytes in the buffer.
+ * \return not used
+ */
+uint8_t set_led_off_cmd(uint8_t *buff, size_t count) {
+  size_t i;
+
+  for (i = 0; i < MAX_NUM_LEDS; i++) {
+    leds[i].r = 0;
+    leds[i].g = 0;
+    leds[i].b = 0;
+  }
+  return 0;
+}
+
+/**
+ * \brief Identify if the buffered message is a valid command.
+ *
+ * \param valid_chars The set of valid command indicators.
+ * \param str_char The char indicating what command to process.
+ * \return True when command is found. False otherwise.
+ */
+bool cmd_check_charset(const char *valid_chars, const char str_char) {
+  bool retval = false;
+  size_t i;
+
+  for (i = 0; i < strlen(valid_chars); i++) {
+    if (str_char == valid_chars[i]) {
+      retval = true;
+      break;
+    }
+  }
+  return retval;
+}
+
+/**
+ * \brief Send a serial response with a payload.
+ *
+ * \param msg The message to send.
+ */
+void log(char *msg) {
+  Serial.write(msg);
 }
