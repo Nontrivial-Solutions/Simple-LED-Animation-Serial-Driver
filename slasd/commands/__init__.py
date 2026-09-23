@@ -1,1 +1,1 @@
-"""Marks the package containing the Fastrak Commands."""
+"""Marks the package containing the SLASD Commands."""

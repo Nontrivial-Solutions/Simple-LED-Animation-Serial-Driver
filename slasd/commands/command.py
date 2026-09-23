@@ -6,22 +6,22 @@ import serial
 
 
 class SerialCommand(Protocol):
-    """Interface describing a generic serial command to a Fastrak.
+    """Interface describing a generic serial command to the Arduino.
 
     Attributes
     ----------
     _commandId : str
         ID of the command. Usually a single ASCII char.
-    _payload : str
+    _payload : bytearray
         Data payload to send with command.
 
     """
 
     _commandId: str
-    _payload: str
+    _payload: bytearray
 
     def send(self, ser: serial.Serial) -> None:
-        """Send a single serial command to a Fastrak.
+        """Send a single serial command to the Arduino.
 
         Parameters
         ----------
@@ -30,26 +30,5 @@ class SerialCommand(Protocol):
 
 
         """
-        ser.write(f'{self._commandId}{self._payload}'.encode(encoding='ASCII'))
-
-
-class SerialCommandWithResponse(SerialCommand):
-    """Interface describing a generic serial command to a Fastrak with a response."""
-
-    def sendResp(self, ser: serial.Serial) -> bytes:
-        """Send a single serial command to a Fastrak.
-
-        Parameters
-        ----------
-        ser : serial.Serial
-            Serial connection to send the frame on.
-
-        Returns
-        -------
-        bytes
-            Response data from Fastrak.
-
-
-        """
-        ser.write(f'{self._commandId}{self._payload}'.encode(encoding='ASCII'))
-        return ser.readline()
+        cmdBytes = bytes(self._commandId, 'ASCII')
+        ser.write(cmdBytes + self._payload)

@@ -5,13 +5,11 @@ set export
 
 # Set up development environment
 bootstrap:
-    arduino-cli core install arduino:avr
-    arduino-cli lib install FastLED
+    uv sync
     if test ! -e .venv; then \
       git submodule deinit -f . ;\
       git submodule update --init --recursive ; \
       prek install -f -c .pre-commit-config.yaml ; \
-      uv venv --python 3.13 && uv sync ;\
     fi
 
 refresh-sub: 
@@ -66,9 +64,14 @@ do-ruff:
     ruff check --fix slasd
     ruff format slasd
 
+##################################################################################################
+####### Compile Arduino #########################################################################
+##################################################################################################
 
 # Compile Arduino
 comp-ard:
+    arduino-cli core install arduino:avr 
+    arduino-cli lib install FastLED
     arduino-cli compile -b arduino:avr:mega arduino_src
 
 

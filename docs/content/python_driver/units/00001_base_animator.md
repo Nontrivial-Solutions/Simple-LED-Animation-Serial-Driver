@@ -21,6 +21,7 @@ The constructor method takes in a collection of data:
 - Serial port name: A string representing which serial port to use to connect to the Fastrak.  
 - Baudrate: A baudrate to use for the serial connection.
 - Serial timeout: How long to wait for the serial connection.
+- LED count: Indicates the number of LED to control.  
 - Run setup flag: Indicates if the constructor should also set up the Fastrak.
 
 ##### State Machine
