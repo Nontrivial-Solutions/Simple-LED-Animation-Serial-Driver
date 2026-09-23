@@ -1,4 +1,4 @@
-"""Marks the package containing the Fastrak driver."""
+"""Marks the package containing the SLASD driver."""
 
 import importlib.metadata
 
