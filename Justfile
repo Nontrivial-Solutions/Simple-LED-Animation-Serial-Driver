@@ -72,8 +72,14 @@ do-ruff:
 comp-ard:
     arduino-cli core install arduino:avr 
     arduino-cli lib install FastLED
+    arduino-cli lib install CRC32
+    
     arduino-cli compile -b arduino:avr:mega arduino_src
 
+upl:
+    arduino-cli core install arduino:avr 
+    arduino-cli lib install FastLED
+    arduino-cli compile -b arduino:avr:mega arduino_src -upload --port /dev/ttyACM0
 
 ##################################################################################################
 ####### check everything #########################################################################
