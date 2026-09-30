@@ -4,21 +4,20 @@ from operator import pos
 
 from serial import Serial, SerialException
 
-LED_COUNT = 255
+LED_COUNT = 1000
 
 if __name__ == '__main__':
     COMport = '/dev/ttyACM0'
-    commandId = b'S'
     size = struct.pack('<H', LED_COUNT)
-    idx = struct.pack('<H', 10)
-    led = bytearray(struct.pack('<B', 255)) * 3
-    countCmd = b'C' + size
-    setCmd = commandId + idx + led
+    idx = struct.pack('<H', 874)
+    led = bytearray(struct.pack('<B', 126)) * 3
+    countCmd = b'C' + size + led
+    setCmd = b'S' + idx + led
     print(
         '####################################################################################'
     )
-    print(setCmd)
     print(countCmd)
+    print(setCmd)
     print(
         '####################################################################################'
     )
@@ -34,11 +33,21 @@ if __name__ == '__main__':
     print(
         '####################################################################################'
     )
-    print('send count command')
-    print(ser.write(countCmd))
-    print('get count command result')
+    # print('send count command')
+    # print(ser.write(countCmd))
+    # print('get count command result')
+    # print(ser.readline())
+    # print(ser.readline())
+    # print(ser.readline())
+    ser.write(countCmd)
     print(ser.readline())
     print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+
+    print(
+        '####################################################################################'
+    )
     print('send set command')
     print(ser.write(setCmd))
     print('get set command result')
@@ -47,4 +56,13 @@ if __name__ == '__main__':
     print(ser.readline())
     print(ser.readline())
     print(ser.readline())
-    ...
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    # ...

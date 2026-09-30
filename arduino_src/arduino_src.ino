@@ -16,7 +16,7 @@
  * \brief The size the LED array. Bounded by memory size of the uc in relation to serial buffer
  *needs.
  */
-#define MAX_NUM_LEDS 1200
+#define MAX_NUM_LEDS 1000u
 
 /**
  * \brief Physical pin the LED are connected to.
@@ -63,8 +63,9 @@ uint8_t set_led_off_cmd();
 uint8_t set_led_count_cmd();
 bool cmd_check_charset(const char *valid_chars, const char str_char);
 uint32_t checksum(uint16_t count);
-uint16_t readUint16();
-color_t readColor();
+bool readUint16(uint16_t *val);
+bool readColor(color_t *color);
+void clearIBuff();
 
 /*************************************************************************************************/
 /************************** Local Variables ******************************************************/
@@ -78,7 +79,7 @@ CRGB leds[MAX_NUM_LEDS];
 /**
  * \brief The collection of LED objects.
  */
-uint16_t ledCount;
+uint16_t ledCount = 0;
 
 /**
  * \brief The state command template.
@@ -104,19 +105,26 @@ uint8_t pinstate = HIGH;
 void setup() {
   /* initialize serial: */
   Serial.begin(9600);
+  while (!Serial) {
+    ;  // wait for serial port to connect. Needed for native USB port only
+  }
   FastLED.addLeds< NEOPIXEL, DATA_PIN >(leds, MAX_NUM_LEDS);
   ledCount = 0u;
   set_led_off_cmd();
+  clearIBuff();
   Serial.println("READY!");
+  Serial.flush();
 }
 void loop() {
-  const cmd_dic_t *dic_p;
-  if (Serial.available()) {
+  while (Serial.available() < 3) { ; }
+  if (Serial.available() > 0) {
     uint8_t curChar = Serial.read();
-    for (dic_p = charcheck_dict[0]; dic_p != NULL; dic_p++) {
+    size_t i;
+    for (i = 0; charcheck_dict[i] != NULL; i++) {
+      const cmd_dic_t *dic_p = charcheck_dict[i];
       if (cmd_check_charset(dic_p->char_class, curChar)) {
         if (dic_p->funptr != NULL) {
-          (void)dic_p->funptr();
+          dic_p->funptr();
         }
         break;
       }
@@ -135,13 +143,14 @@ void loop() {
  * \return not used
  */
 uint8_t set_led_state_cmd() {
-  uint16_t idx = readUint16();
+  uint16_t idx;
+  color_t color;
+  readUint16(&idx);
   Serial.println(idx);
-  Serial.println(ledCount);
   if (idx > ledCount) {
     Serial.println("ERROR: idx out of range");
   }
-  color_t color = readColor();
+  readColor(&color);
   leds[idx].r = color.red;
   leds[idx].g = color.green;
   leds[idx].b = color.blue;
@@ -155,8 +164,8 @@ uint8_t set_led_state_cmd() {
  * \return not used
  */
 uint8_t set_led_count_cmd() {
-  ledCount = readUint16();
-  if (ledCount > MAX_NUM_LEDS) {
+  readUint16(&ledCount);
+  if (MAX_NUM_LEDS < ledCount) {
     Serial.println("ERROR: to many LED");
   }
   return 0;
@@ -197,32 +206,52 @@ bool cmd_check_charset(const char *valid_chars, const char str_char) {
   return retval;
 }
 
-color_t readColor() {
-  color_t color;
-  color.red = Serial.read();
-  color.green = Serial.read();
-  color.blue = Serial.read();
+bool readColor(color_t *color) {
+  bool retval = false;
+  if (3 <= Serial.available()) {
+    color->red = Serial.read();
+    color->green = Serial.read();
+    color->blue = Serial.read();
+    retval = true;
+  }
   return color;
 }
 
-uint16_t readUint16() {
-  uint8_t lower = Serial.read();
-  uint8_t upper = Serial.read();
-  uint16_t retval = 0;
-  retval = upper;
-  retval <<= 8;
-  retval |= lower;
+bool readUint16(uint16_t *val) {
+  bool retval = false;
+
+  if (2 <= Serial.available()) {
+    uint8_t lower = Serial.read();
+    uint8_t upper = Serial.read();
+
+    Serial.print("DEBUG: upper is ");
+    Serial.print(upper);
+    Serial.print(" lower is ");
+    Serial.println(lower);
+
+    *val = upper;
+    *val <<= 8;
+    *val |= lower;
+    retval = true;
+  }
+
   return retval;
 }
 
 uint32_t checksum(uint16_t count) {
   CRC32 crc;
   size_t i;
-  // Here we add each byte to the checksum, caclulating the checksum as we go.
   for (i = 0; i < count; i++) {
     crc.update(leds[i].r);
     crc.update(leds[i].g);
     crc.update(leds[i].b);
   }
   return crc.finalize();
+}
+
+
+void clearIBuff() {
+  while (Serial.available() > 0) {
+    Serial.read();
+  }
 }
