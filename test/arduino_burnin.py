@@ -1,6 +1,5 @@
 import binascii
 import struct
-from curses import baudrate
 from operator import pos
 
 from serial import Serial, SerialException

@@ -147,7 +147,8 @@ uint8_t set_led_state_cmd() {
   color_t color;
   readUint16(&idx);
   if (idx >= ledCount) {
-    Serial.println("ERROR: idx out of range");
+    Serial.print("ERROR: idx out of range");
+    Serial.println(ledCount);
   }
   readColor(&color);
   leds[idx].red = color.red;
@@ -165,7 +166,8 @@ uint8_t set_led_state_cmd() {
 uint8_t set_led_count_cmd() {
   readUint16(&ledCount);
   if (MAX_NUM_LEDS < ledCount) {
-    Serial.println("ERROR: to many LED");
+    Serial.print(" ERROR: to many LED ");
+    Serial.println(ledCount);
   }
   return 0;
 }
