@@ -116,7 +116,6 @@ void setup() {
   Serial.flush();
 }
 void loop() {
-  while (Serial.available() < 3) { ; }
   if (Serial.available() > 0) {
     uint8_t curChar = Serial.read();
     size_t i;
@@ -131,6 +130,7 @@ void loop() {
     }
   }
   FastLED.show();
+  delay(500);
 }
 
 /*************************************************************************************************/
@@ -146,14 +146,13 @@ uint8_t set_led_state_cmd() {
   uint16_t idx;
   color_t color;
   readUint16(&idx);
-  Serial.println(idx);
-  if (idx > ledCount) {
+  if (idx >= ledCount) {
     Serial.println("ERROR: idx out of range");
   }
   readColor(&color);
-  leds[idx].r = color.red;
-  leds[idx].g = color.green;
-  leds[idx].b = color.blue;
+  leds[idx].red = color.red;
+  leds[idx].green = color.green;
+  leds[idx].blue = color.blue;
   Serial.println(checksum(ledCount));
   return 0;
 }
@@ -214,7 +213,7 @@ bool readColor(color_t *color) {
     color->blue = Serial.read();
     retval = true;
   }
-  return color;
+  return retval;
 }
 
 bool readUint16(uint16_t *val) {
@@ -223,12 +222,6 @@ bool readUint16(uint16_t *val) {
   if (2 <= Serial.available()) {
     uint8_t lower = Serial.read();
     uint8_t upper = Serial.read();
-
-    Serial.print("DEBUG: upper is ");
-    Serial.print(upper);
-    Serial.print(" lower is ");
-    Serial.println(lower);
-
     *val = upper;
     *val <<= 8;
     *val |= lower;
@@ -242,11 +235,11 @@ uint32_t checksum(uint16_t count) {
   CRC32 crc;
   size_t i;
   for (i = 0; i < count; i++) {
-    crc.update(leds[i].r);
-    crc.update(leds[i].g);
-    crc.update(leds[i].b);
+    crc.add(leds[i].r);
+    crc.add(leds[i].g);
+    crc.add(leds[i].b);
   }
-  return crc.finalize();
+  return crc.calc();
 }
 
 

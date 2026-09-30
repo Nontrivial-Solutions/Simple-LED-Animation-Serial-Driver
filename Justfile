@@ -72,7 +72,7 @@ do-ruff:
 comp-ard:
     arduino-cli core install arduino:avr 
     arduino-cli lib install FastLED
-    arduino-cli lib install CRC32
+    arduino-cli lib install CRC
     
     arduino-cli compile -b arduino:avr:mega arduino_src
 
