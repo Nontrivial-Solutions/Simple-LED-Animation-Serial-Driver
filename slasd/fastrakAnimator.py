@@ -25,7 +25,7 @@ class FastrakParams(TypedDict):
         The angular range $\\theta$, in degrees, to light up. In the example below the `O`
         correspond to lit LED and `X` to unlit LED.
         ```ascii
-                         OOOOOOOOOOO
+                         OOOOOZOOOOO
                     OOOOO           OOOOO
                   OO                     OO
                 XO           θ           .'XX
@@ -45,15 +45,13 @@ class FastrakParams(TypedDict):
                 XX                         XX
                   XX                     XX
                     XXXXX           XXXXX
-                         XXXXXXXXXXX
+                         XXXXXTXXXXX
         ```
 
-    colorR : int
-        The red component of the LED lit color.
-    colorG : int
-        The green component of the LED lit color.
-    colorB : int
-        The blue component of the LED lit color.
+    zeroLED: int
+        The LED that serves as the "zero point" for the LED circle. In the example above `T`
+        indicates the "true" zero (first physical LED on the strand) and `Z` indicates the offset
+        zero.
     """
 
     posData: FastrakPostion
@@ -76,15 +74,17 @@ class FastrakAnimationDevice(LedAnimationDevice):
 
         Returns
         -------
-        bytearray
-            The on/off and color state for each LED in the array.
-
+        tuple[list[SetLedState], int]
+            A tuple containing first a collection of commands to send (in order) to the Arduino.
+            Second the [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
+            state of the LED array.
 
         """
         if (
             kwargs is None
             or 'posData' not in kwargs
             or 'angleToLight' not in kwargs
+            or 'zeroLED' not in kwargs
             or type(kwargs['posData']) is not FastrakPostion
             or type(kwargs['angleToLight']) is not int
             or type(kwargs['zeroLED']) is not int

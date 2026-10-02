@@ -33,7 +33,6 @@ class SerialCommand(Protocol):
         """
         cmdBytes = bytes(self._commandId, 'ASCII')
         ser.write(cmdBytes + self._payload)
-        print(cmdBytes + self._payload)
 
 
 class SerialCommandWithResponse(SerialCommand):
@@ -42,11 +41,20 @@ class SerialCommandWithResponse(SerialCommand):
     _readLen: int
     _resp: bytes | None
 
-    def parsedResp(self):
+    def parsedResp(self) -> object:
+        """Parse the response data into a meaningful object.
+
+        Returns
+        -------
+        object
+            A meaningful object representation of the response data.
+
+
+        """
         raise NotImplementedError
 
     def sendRespLine(self, ser: serial.Serial) -> bytes:
-        """Send a single serial command to a Fastrak.
+        r"""Send a single serial command to a Fastrak. Read a single `\n` terminated line.
 
         Parameters
         ----------
@@ -67,7 +75,7 @@ class SerialCommandWithResponse(SerialCommand):
         return self._resp
 
     def sendResp(self, ser: serial.Serial) -> bytes:
-        """Send a single serial command to a Fastrak.
+        """Send a single serial command to a Fastrak. Read $n$ bytes from the serial interface.
 
         Parameters
         ----------

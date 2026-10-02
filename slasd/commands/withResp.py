@@ -30,6 +30,16 @@ class SetLedState(SerialCommandWithResponse):
         self._resp = None
 
     def parsedResp(self) -> int | None:
+        """Parse the response into an integer
+        [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check).
+
+        Returns
+        -------
+        int | None
+            When the response exists an int. Otherwise, response is None.
+
+
+        """
         if self._resp is None or self._resp == b'':
             return None
         return int(self._resp[:-2])

@@ -31,6 +31,9 @@ class LedAnimationDevice:
     _ledCount: int
         The number of LED in the array.
 
+    _color : LedColor
+        The color of a lit LED.
+
     """
 
     _ser: Serial | None
@@ -68,6 +71,9 @@ class LedAnimationDevice:
         setup : int, default: True
             Flag indicating if the device should connect to the serial interface.
 
+        color : LedColor, default: #000000
+            The color to command a lit LED to be.
+
         """
         self._ser = None
         self._COMport = COMport
@@ -91,7 +97,6 @@ class LedAnimationDevice:
             self._ser.readline()
             sleep(0.01)
             SetLedCount(self._ledCount).send(self._ser)
-            print(self._ser.readline())
 
     def _computeState(self, **kwargs) -> tuple[list[SetLedState], int]:
         """State computation interface.
@@ -104,10 +109,10 @@ class LedAnimationDevice:
 
         Returns
         -------
-        bytearray
-            The computed state of the LED array.
-
-
+        tuple[list[SetLedState], int]
+            A tuple containing first a collection of commands to send (in order) to the Arduino.
+            Second the [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
+            state of the LED array.
         """
         raise NotImplementedError
 
@@ -131,8 +136,5 @@ class LedAnimationDevice:
         commands[-1].sendRespLine(self._ser)
         crcFromDev = commands[-1].parsedResp()
 
-        print(
-            f'CRC is {crc} and computed as {crcFromDev} they {"" if crc == crcFromDev else "dont "}match.'
-        )
         if crc != crcFromDev:
             raise Exception('an error occurred')  # TODO: Add specific Exception

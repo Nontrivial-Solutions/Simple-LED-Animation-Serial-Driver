@@ -6,7 +6,7 @@ from .command import SerialCommand
 
 
 class SetLedCount(SerialCommand):
-    """Send a command to the Arduino to set the LED array state."""
+    """Send a command to the Arduino to set the count for number of LED."""
 
     def __init__(
         self,
@@ -16,8 +16,8 @@ class SetLedCount(SerialCommand):
 
         Parameters
         ----------
-        data : bytearray
-            The data payload to provide to the Arduino.
+        count : int
+            The number of LED in the array.
 
         """
         self._commandId = 'C'
