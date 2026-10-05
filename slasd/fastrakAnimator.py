@@ -1,5 +1,6 @@
 """Contains the Fastrak device angular illuminator class."""
 
+import binascii
 import struct
 from math import floor
 from typing import TypedDict
@@ -7,6 +8,9 @@ from typing import TypedDict
 from fastrakSerialDriver.fastrakPosition import FastrakPostion
 from typing_extensions import Unpack
 
+from slasd.commands.withResp import SetLedState
+
+from .commands.support import LedColor
 from .ledAnimationDriver import LedAnimationDevice
 
 
@@ -21,7 +25,7 @@ class FastrakParams(TypedDict):
         The angular range $\\theta$, in degrees, to light up. In the example below the `O`
         correspond to lit LED and `X` to unlit LED.
         ```ascii
-                         OOOOOOOOOOO
+                         OOOOOZOOOOO
                     OOOOO           OOOOO
                   OO                     OO
                 XO           θ           .'XX
@@ -41,28 +45,26 @@ class FastrakParams(TypedDict):
                 XX                         XX
                   XX                     XX
                     XXXXX           XXXXX
-                         XXXXXXXXXXX
+                         XXXXXTXXXXX
         ```
 
-    colorR : int
-        The red component of the LED lit color.
-    colorG : int
-        The green component of the LED lit color.
-    colorB : int
-        The blue component of the LED lit color.
+    zeroLED: int
+        The LED that serves as the "zero point" for the LED circle. In the example above `T`
+        indicates the "true" zero (first physical LED on the strand) and `Z` indicates the offset
+        zero.
     """
 
     posData: FastrakPostion
     angleToLight: int
-    colorR: int
-    colorG: int
-    colorB: int
+    zeroLED: int
 
 
 class FastrakAnimationDevice(LedAnimationDevice):
     """Implements LedAnimationDevice for the Fastrak look position use case."""
 
-    def _computeState(self, **kwargs: Unpack[FastrakParams]) -> bytearray:  # ty:ignore[invalid-method-override]
+    def _computeState(
+        self, **kwargs: Unpack[FastrakParams]
+    ) -> tuple[list[SetLedState], int]:  # ty:ignore[invalid-method-override]
         """Compute the state array for the LED in the Fastrak look position use case.
 
         Parameters
@@ -72,62 +74,46 @@ class FastrakAnimationDevice(LedAnimationDevice):
 
         Returns
         -------
-        bytearray
-            The on/off and color state for each LED in the array.
-
+        tuple[list[SetLedState], int]
+            A tuple containing first a collection of commands to send (in order) to the Arduino.
+            Second the [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
+            state of the LED array.
 
         """
         if (
             kwargs is None
             or 'posData' not in kwargs
             or 'angleToLight' not in kwargs
-            or 'colorR' not in kwargs
-            or 'colorG' not in kwargs
-            or 'colorB' not in kwargs
+            or 'zeroLED' not in kwargs
             or type(kwargs['posData']) is not FastrakPostion
             or type(kwargs['angleToLight']) is not int
-            or type(kwargs['colorR']) is not int
-            or type(kwargs['colorG']) is not int
-            or type(kwargs['colorB']) is not int
+            or type(kwargs['zeroLED']) is not int
         ):
-            raise TypeError
-
-        if kwargs['colorR'] < 0 or kwargs['colorR'] > 255:
-            raise TypeError
-        if kwargs['colorG'] < 0 or kwargs['colorG'] > 255:
-            raise TypeError
-        if kwargs['colorB'] < 0 or kwargs['colorB'] > 255:
-            raise TypeError
-
-        byteCr = struct.pack('<B', kwargs['colorR'])
-        byteCg = struct.pack('<B', kwargs['colorG'])
-        byteCb = struct.pack('<B', kwargs['colorB'])
-
-        if len(byteCb) != 1 or len(byteCg) != 1 or len(byteCr) != 1:
             raise TypeError
 
         pos = kwargs['posData']
         lightAngle = kwargs['angleToLight']
+        zeroLED = kwargs['zeroLED']
         litCenterLed = floor((self._ledCount / 360) * pos.psi)
         lookAngleCnt = floor((self._ledCount / 360) * lightAngle)
-        payload = bytearray(b'\0' * (3 * self._ledCount))
+
+        commands = []
+        crcComp = 0
+
+        for _ in range(
+            floor(litCenterLed - (lookAngleCnt / 2)),
+        ):
+            crcComp = binascii.crc32(b'\x00\x00\x00', crcComp)
 
         for i in range(
             floor(litCenterLed - (lookAngleCnt / 2)),
-            litCenterLed,
-            3,
-        ):
-            payload[i] = byteCr[0]
-            payload[i + 1] = byteCg[0]
-            payload[i + 2] = byteCb[0]
-
-        for i in range(
-            litCenterLed,
             floor(litCenterLed + (lookAngleCnt / 2)) + 1,
-            3,
         ):
-            payload[i] = byteCr[0]
-            payload[i + 1] = byteCg[0]
-            payload[i + 2] = byteCb[0]
+            colorBytes = self._color.to_bytes()
+            commands.append(SetLedState((i + zeroLED) % self._ledCount, self._color))
+            crcComp = binascii.crc32(colorBytes, crcComp)
 
-        return payload
+        for _ in range(floor(litCenterLed + (lookAngleCnt / 2)) + 1, self._ledCount):
+            crcComp = binascii.crc32(b'\x00\x00\x00', crcComp)
+
+        return commands, crcComp

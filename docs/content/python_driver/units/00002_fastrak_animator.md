@@ -20,10 +20,7 @@ Computes the data packet to be sent to a Fastrak device. Takes the following as 
 
 - Current Fastrak position
 - Look angle to illuminate
-- Color data to for the lit NEOPIXEL as one each of
-    - Red
-    - Green
-    - Blue
+- LED index to set as zero  
 
 ##### State Machine
 
@@ -31,7 +28,7 @@ Computes the data packet to be sent to a Fastrak device. Takes the following as 
 stateDiagram-v2
     state "Compute lights per angle" as lpa 
     state "Compute center light from position" as cclfp 
-    state "Construct array of led states" as caols 
+    state "Construct array of led state commands" as caols 
     [*] --> lpa
     lpa --> cclfp
     cclfp --> caols
