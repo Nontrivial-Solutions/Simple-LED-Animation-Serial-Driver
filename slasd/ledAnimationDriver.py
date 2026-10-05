@@ -8,7 +8,7 @@ from serial import Serial
 
 from slasd.commands.support import LedColor
 
-from .commands.noResp import SetLedCount
+from .commands.noResp import SetLedCount, SetLedOff
 from .commands.withResp import SetLedState
 
 
@@ -116,6 +116,13 @@ class LedAnimationDevice:
             state of the LED array.
         """
         raise NotImplementedError
+
+    def setOff(self):
+        """Set the LED array off."""
+        if self._ser is None:
+            raise TypeError
+
+        SetLedOff().send(self._ser)
 
     def compNSndState(self, **kwargs) -> None:
         """Compute and set the state of the LED array.
