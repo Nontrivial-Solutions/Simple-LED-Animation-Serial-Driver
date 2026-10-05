@@ -62,6 +62,70 @@ class FastrakParams(TypedDict):
 class FastrakAnimationDevice(LedAnimationDevice):
     """Implements LedAnimationDevice for the Fastrak look position use case."""
 
+    def __init__(
+        self,
+        COMport: str = 'COM1',
+        baud: int = 9600,
+        timeout: int = 1,
+        ledCount: int = 1000,
+        setup: bool = True,
+        color: LedColor = LedColor(red=0, blue=0, green=0),
+    ) -> None:
+        super().__init__(COMport, baud, timeout, ledCount, setup, color)
+
+    @classmethod
+    def create_valid_device(
+        cls,
+        COMport: str = 'COM1',
+        baud: int = 9600,
+        timeout: int = 1,
+        ledCount: int = 1000,
+        setup: bool = True,
+        color: LedColor = LedColor(red=0, blue=0, green=0),
+    ) -> 'None | FastrakAnimationDevice':
+        """Construct a FastrakAnimationDevice class.
+
+        Parameters
+        ----------
+        COMport : str
+            String representing the COM port to be connected to.
+
+        baud : int, default: 1115200
+            Baudrate for the serial connection.
+
+        timeout : int, default: 1second
+            Serial timeout for the connection.
+
+        ledCount: int, defualt: 100
+            The number of LED in the array.
+
+        setup : int, default: True
+            Flag indicating if the device should connect to the serial interface.
+
+        color : LedColor, default: #000000
+            The color to command a lit LED to be.
+
+        """
+
+        if not (
+            COMport
+            and baud
+            and timeout
+            and ledCount
+            and color is not None
+            and setup is not None
+        ):
+            return None
+
+        return cls(
+            COMport=COMport,
+            baud=baud,
+            timeout=timeout,
+            ledCount=ledCount,
+            setup=setup,
+            color=color,
+        )
+
     def _computeState(
         self, **kwargs: Unpack[FastrakParams]
     ) -> tuple[list[SetLedState], int]:  # ty:ignore[invalid-method-override]
