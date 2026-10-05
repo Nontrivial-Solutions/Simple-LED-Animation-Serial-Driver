@@ -24,3 +24,15 @@ class SetLedCount(SerialCommand):
         self._payload = bytearray()
         self._payload += struct.pack('<H', count)
         self._payload += b'\n'
+
+
+class SetLedOff(SerialCommand):
+    """Send a command to the Arduino to command every LED off."""
+
+    def __init__(
+        self,
+    ) -> None:
+        """Class constructor."""
+        self._commandId = 'O'
+        self._payload = bytearray()
+        self._payload += b'\n'

@@ -14,7 +14,7 @@ maintains a serial connection to a physical device to which it issues commands.
 
 ### Public Interfaces
 
-#### Constructor
+#### Constructor and Valid Constructor
 
 The constructor method takes in a collection of data:
 
@@ -75,6 +75,20 @@ stateDiagram-v2
     is_connected --> [*]: State is correct
     is_connected --> f: State is incorrect
     f --> [*]
+
+```
+
+#### Set LED Array Off
+
+Set the state of the LED array to off.  
+
+##### State Machine
+
+```mermaid
+stateDiagram-v2
+    state "Command state off" as cs 
+    [*] --> cs 
+    cs --> [*]
 
 ```
 
