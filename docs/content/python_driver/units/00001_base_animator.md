@@ -23,6 +23,7 @@ The constructor method takes in a collection of data:
 - Serial timeout: How long to wait for the serial connection.
 - LED count: Indicates the number of LED to control.  
 - Run setup flag: Indicates if the constructor should also set up the Fastrak.
+- LED Color: Indicates what color the active LED should be set to.
 
 ##### State Machine
 
@@ -53,6 +54,27 @@ stateDiagram-v2
     is_connected --> [*]: Is connected
     is_connected --> cd: Is not connected
     cd --> [*]
+
+```
+
+#### Compute and Send State
+
+Compute the state of the LED array and send updates to the Arduino.
+
+##### State Machine
+
+```mermaid
+stateDiagram-v2
+    state "Compute State" as cs 
+    state "Send State Updates" as ssu
+    state "Fail" as f
+    state is_connected <<choice>>
+    [*] --> cs 
+    cs --> ssu
+    ssu --> is_connected
+    is_connected --> [*]: State is correct
+    is_connected --> f: State is incorrect
+    f --> [*]
 
 ```
 
