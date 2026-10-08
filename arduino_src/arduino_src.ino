@@ -87,6 +87,8 @@ uint16_t ledCount = 0;
 cmd_dic_t setState = { "Ss", &set_led_state_cmd };
 
 cmd_dic_t setCount = { "Cc", &set_led_count_cmd };
+cmd_dic_t setShow = { "Hh", &set_show };
+cmd_dic_t getCrc = { "Rr", &get_crc };
 
 /**
  * \brief The off command template.
@@ -129,8 +131,7 @@ void loop() {
       }
     }
   }
-  FastLED.show();
-  delay(500);
+  delay(100);
 }
 
 /*************************************************************************************************/
@@ -154,7 +155,6 @@ uint8_t set_led_state_cmd() {
   leds[idx].red = color.red;
   leds[idx].green = color.green;
   leds[idx].blue = color.blue;
-  Serial.println(checksum(ledCount));
   return 0;
 }
 
@@ -184,6 +184,16 @@ uint8_t set_led_off_cmd() {
     leds[i].g = 0;
     leds[i].b = 0;
   }
+  return 0;
+}
+
+uint8_t set_show() {
+  FastLED.show();
+  return 0;
+}
+
+uint8_t get_crc() {
+  Serial.println(checksum(ledCount));
   return 0;
 }
 
