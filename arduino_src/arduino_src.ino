@@ -26,6 +26,8 @@
 
 #define BUFFER_SIZE (64u)
 
+#define ACK_STR ("ACK")
+
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -46,16 +48,6 @@ typedef struct cmd_dic_t {
   cmd_handler_funptr_t funptr; /**< The callback used to process the command.*/
 } cmd_dic_t;
 
-/**
- * \struct color_t
- * \brief The storage type for a color tuple.
- *
- */
-typedef struct color_t {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-} color_t;
 /*************************************************************************************************/
 /************************** Private Function Declarations ****************************************/
 /*************************************************************************************************/
@@ -75,7 +67,6 @@ void clearIBuff();
  * \brief The collection of LED objects.
  */
 CRGB leds[MAX_NUM_LEDS];
-color_t leds_mirror[MAX_NUM_LEDS];
 
 char serialBuffer[BUFFER_SIZE];
 
@@ -119,7 +110,7 @@ void setup() {
   ledCount = 0u;
   set_led_off_cmd();
   clearIBuff();
-  Serial.println("READY!");
+  Serial.println(ACK_STR);
   Serial.flush();
 }
 
@@ -202,10 +193,7 @@ uint8_t set_led_state_cmd() {
   leds[idx].red = (uint8_t)r;
   leds[idx].green = (uint8_t)g;
   leds[idx].blue = (uint8_t)b;
-  leds_mirror[idx].red = (uint8_t)r;
-  leds_mirror[idx].green = (uint8_t)g;
-  leds_mirror[idx].blue = (uint8_t)b;
-  Serial.println("ack");
+  Serial.println(ACK_STR);
   return 0;
 }
 
@@ -230,7 +218,7 @@ uint8_t set_led_count_cmd() {
     return 1;
   }
   ledCount = tcount;
-  Serial.println("ack");
+  Serial.println(ACK_STR);
   return 0;
 }
 
@@ -242,20 +230,17 @@ uint8_t set_led_count_cmd() {
 uint8_t set_led_off_cmd() {
   size_t i;
   for (i = 0; i < MAX_NUM_LEDS; i++) {
-    leds[i].r = 0;
-    leds[i].g = 0;
-    leds[i].b = 0;
-    leds_mirror[i].red = (uint8_t)0;
-    leds_mirror[i].green = (uint8_t)0;
-    leds_mirror[i].blue = (uint8_t)0;
+    leds[i].r = (uint8_t)0u;
+    leds[i].g = (uint8_t)0u;
+    leds[i].b = (uint8_t)0u;
   }
-  Serial.println("ack");
+  Serial.println(ACK_STR);
   return 0;
 }
 
 uint8_t set_show() {
   FastLED.show();
-  Serial.println("ack");
+  Serial.println(ACK_STR);
   return 0;
 }
 
@@ -288,9 +273,9 @@ uint32_t get_checksum(uint16_t count) {
   CRC32 crc;
   size_t i;
   for (i = 0; i < count; i++) {
-    crc.add(leds_mirror[i].red);
-    crc.add(leds_mirror[i].green);
-    crc.add(leds_mirror[i].blue);
+    crc.add(leds[i].red);
+    crc.add(leds[i].green);
+    crc.add(leds[i].blue);
   }
   return crc.calc();
   ;

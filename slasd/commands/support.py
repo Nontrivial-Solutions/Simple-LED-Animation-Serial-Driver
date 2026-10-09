@@ -3,6 +3,8 @@
 import struct
 from dataclasses import dataclass
 
+ACK_STR = b'ACK'
+
 
 @dataclass()
 class LedColor:

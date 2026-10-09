@@ -9,6 +9,7 @@ from serial import Serial
 from slasd.commands.support import LedColor
 
 from .commands.noResp import CmdShow, SetLedCount, SetLedOff, SetLedState
+from .commands.support import ACK_STR
 from .commands.withResp import GetCrc
 
 
@@ -47,7 +48,7 @@ class LedAnimationDevice:
 
     def __init__(
         self,
-        COMport: str = 'COM1',
+        COMport: str = 'COM4',
         baud: int = 9600,
         timeout: int = 1,
         ledCount: int = 1000,
@@ -94,7 +95,7 @@ class LedAnimationDevice:
         else:
             self._ser = Serial(self._COMport, self._baud, timeout=self._timeout)
             res = self._ser.readline()
-            while res != b'READY!\r\n':
+            while res[:-2] != ACK_STR:
                 res = self._ser.readline()
             self._ser.readline()
             sleep(0.1)

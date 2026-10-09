@@ -5,6 +5,8 @@ from typing import Protocol
 
 import serial
 
+from slasd.commands.support import ACK_STR
+
 
 class SerialCommand(Protocol):
     """Interface describing a generic serial command to the Arduino.
@@ -36,7 +38,7 @@ class SerialCommand(Protocol):
         ser.flush()
         if ackCheck:
             resp = ser.readline()
-            if resp[:-2] != b'ack':
+            if resp[:-2] != ACK_STR:
                 print(resp)
                 raise Exception('an error occurred')  # TODO: Add specific Exception
 

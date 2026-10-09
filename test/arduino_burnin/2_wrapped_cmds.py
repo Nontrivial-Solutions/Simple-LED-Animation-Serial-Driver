@@ -6,7 +6,7 @@ from operator import pos
 from serial import Serial, SerialException
 
 from slasd.commands.noResp import CmdShow, SetLedCount, SetLedState
-from slasd.commands.support import LedColor
+from slasd.commands.support import ACK_STR, LedColor
 from slasd.commands.withResp import GetCrc
 
 LED_COUNT = 1000
@@ -16,15 +16,17 @@ if __name__ == '__main__':
     COMport = '/dev/ttyACM0'
     ser = Serial(port=COMport, baudrate=9600, timeout=1)
     res = ser.readline()
-    while res != b'READY!\r\n':
+    while res[:-2] != ACK_STR:
         res = ser.readline()
         print('Not ready.')
         ...
     print(res)
     print(ser.readline())
     SetLedCount(LED_COUNT).send(ser)
+    print(ser.readline())
     color = LedColor(red=LED_COLOR, green=LED_COLOR, blue=LED_COLOR)
     SetLedState(LED_IDX, color).send(ser)
+    print(ser.readline())
     crccmd = GetCrc()
     crccmd.sendRespLine(ser)
     crc = crccmd.parsedResp()
