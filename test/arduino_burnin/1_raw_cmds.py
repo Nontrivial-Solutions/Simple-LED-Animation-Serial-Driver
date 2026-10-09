@@ -9,11 +9,13 @@ LED_IDX = 874
 LED_COLOR = 126
 if __name__ == '__main__':
     COMport = '/dev/ttyACM0'
-    size = struct.pack('<H', LED_COUNT)
-    idx = struct.pack('<H', LED_IDX)
-    led = bytearray(struct.pack('<B', LED_COLOR)) * 3
+    size = bytearray(str(LED_COUNT), 'ASCII')
+    idx = bytearray(str(LED_IDX), 'ASCII')
+    led = bytearray(str(LED_COLOR), 'ASCII')
     countCmd = b'C' + size
-    setCmd = b'S' + idx + led
+    crcCmd = b'R'
+    showCmd = b'H'
+    setCmd = b'S' + idx + b':' + led + b':' + led + b':' + led
     print(
         '####################################################################################'
     )
@@ -34,30 +36,33 @@ if __name__ == '__main__':
     print(
         '####################################################################################'
     )
-    # print('send count command')
-    # print(ser.write(countCmd))
-    # print('get count command result')
-    # print(ser.readline())
-    # print(ser.readline())
-    # print(ser.readline())
     ser.write(countCmd)
-    print(ser.readline())
-    print(ser.readline())
-    print(ser.readline())
-    print(ser.readline())
 
     print(
         '####################################################################################'
     )
     print('send set command')
-    print(ser.write(setCmd))
+    ser.write(setCmd)
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+
     print('get set command result')
-    crc = ser.read(34)[:-2]
-    crc = int(crc)
+    ser.write(crcCmd)
     print(ser.readline())
     print(ser.readline())
     print(ser.readline())
     print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    print(ser.readline())
+    crc = ser.readline()
+    while crc == b'':
+        crc = ser.readline()
+        ...
+    print(crc)
 
     crcComp = 0
     for i in range(LED_IDX):

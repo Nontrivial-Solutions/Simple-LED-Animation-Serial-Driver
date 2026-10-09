@@ -5,9 +5,9 @@ from operator import pos
 
 from serial import Serial, SerialException
 
-from slasd.commands.noResp import SetLedCount
+from slasd.commands.noResp import CmdShow, SetLedCount, SetLedState
 from slasd.commands.support import LedColor
-from slasd.commands.withResp import SetLedState
+from slasd.commands.withResp import GetCrc
 
 LED_COUNT = 1000
 LED_IDX = 874
@@ -24,9 +24,10 @@ if __name__ == '__main__':
     print(ser.readline())
     SetLedCount(LED_COUNT).send(ser)
     color = LedColor(red=LED_COLOR, green=LED_COLOR, blue=LED_COLOR)
-    stateCmd = SetLedState(LED_IDX, color)
-    stateCmd.sendRespLine(ser)
-    crc = stateCmd.parsedResp()
+    SetLedState(LED_IDX, color).send(ser)
+    crccmd = GetCrc()
+    crccmd.sendRespLine(ser)
+    crc = crccmd.parsedResp()
 
     crcComp = 0
     for i in range(LED_IDX):

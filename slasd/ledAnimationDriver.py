@@ -8,8 +8,8 @@ from serial import Serial
 
 from slasd.commands.support import LedColor
 
-from .commands.noResp import SetLedCount, SetLedOff
-from .commands.withResp import SetLedState
+from .commands.noResp import CmdShow, SetLedCount, SetLedOff, SetLedState
+from .commands.withResp import GetCrc
 
 
 class LedAnimationDevice:
@@ -43,6 +43,7 @@ class LedAnimationDevice:
     _timeout: int
     _ledCount: int
     _color: LedColor
+    _ledMirror: list[LedColor]
 
     def __init__(
         self,
@@ -96,8 +97,10 @@ class LedAnimationDevice:
             while res != b'READY!\r\n':
                 res = self._ser.readline()
             self._ser.readline()
-            sleep(0.01)
+            sleep(0.1)
             SetLedCount(self._ledCount).send(self._ser)
+            sleep(0.1)
+            self._ledMirror = [LedColor(0, 0, 0)] * self._ledCount
 
     def _computeState(self, **kwargs) -> tuple[list[SetLedState], int]:
         """State computation interface.
@@ -138,11 +141,13 @@ class LedAnimationDevice:
 
         commands, crc = self._computeState(**kwargs)
 
-        for command in commands[:-1]:
+        for command in commands:
             command.send(self._ser)
 
-        commands[-1].sendRespLine(self._ser)
-        crcFromDev = commands[-1].parsedResp()
+        crcFromDev = GetCrc()
+        crcFromDev.sendRespLine(self._ser)
 
-        if crc != crcFromDev:
+        if crc != crcFromDev.parsedResp():
+            print(crcFromDev._resp)
             raise Exception('an error occurred')  # TODO: Add specific Exception
+        CmdShow().send(self._ser)
