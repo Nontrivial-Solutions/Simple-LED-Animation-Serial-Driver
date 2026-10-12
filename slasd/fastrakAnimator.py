@@ -1,14 +1,13 @@
 """Contains the Fastrak device angular illuminator class."""
 
 import binascii
-import struct
 from math import floor
 from typing import TypedDict
 
 from fastrakSerialDriver.fastrakPosition import FastrakPostion
 from typing_extensions import Unpack
 
-from slasd.commands.withResp import SetLedState
+from slasd.commands.noResp import SetLedState
 
 from .commands.support import LedColor
 from .ledAnimationDriver import LedAnimationDevice
@@ -69,8 +68,33 @@ class FastrakAnimationDevice(LedAnimationDevice):
         timeout: int = 1,
         ledCount: int = 1000,
         setup: bool = True,
-        color: LedColor = LedColor(red=0, blue=0, green=0),
+        color: LedColor | None = None,
     ) -> None:
+        """Construct a FastrakAnimationDevice class.
+
+        Parameters
+        ----------
+        COMport : str
+            String representing the COM port to be connected to.
+
+        baud : int, default: 1115200
+            Baudrate for the serial connection.
+
+        timeout : int, default: 1second
+            Serial timeout for the connection.
+
+        ledCount: int, defualt: 100
+            The number of LED in the array.
+
+        setup : int, default: True
+            Flag indicating if the device should connect to the serial interface.
+
+        color : LedColor or None, default: None
+            The color to command a lit LED to be. None if zero should be #000000.
+
+        """
+        if color is None:
+            color = LedColor(red=0, blue=0, green=0)
         super().__init__(COMport, baud, timeout, ledCount, setup, color)
 
     @classmethod
@@ -81,7 +105,7 @@ class FastrakAnimationDevice(LedAnimationDevice):
         timeout: int = 1,
         ledCount: int = 1000,
         setup: bool = True,
-        color: LedColor = LedColor(red=0, blue=0, green=0),
+        color: LedColor | None = None,
     ) -> 'None | FastrakAnimationDevice':
         """Construct a FastrakAnimationDevice class.
 
@@ -102,19 +126,14 @@ class FastrakAnimationDevice(LedAnimationDevice):
         setup : int, default: True
             Flag indicating if the device should connect to the serial interface.
 
-        color : LedColor, default: #000000
-            The color to command a lit LED to be.
+        color : LedColor or None, default: None
+            The color to command a lit LED to be. None if zero should be #000000.
 
         """
+        if color is None:
+            color = LedColor(red=0, blue=0, green=0)
 
-        if not (
-            COMport
-            and baud
-            and timeout
-            and ledCount
-            and color is not None
-            and setup is not None
-        ):
+        if not (COMport and baud and timeout and ledCount and setup is not None):
             return None
 
         return cls(
@@ -160,24 +179,27 @@ class FastrakAnimationDevice(LedAnimationDevice):
         zeroLED = kwargs['zeroLED']
         litCenterLed = floor((self._ledCount / 360) * pos.psi)
         lookAngleCnt = floor((self._ledCount / 360) * lightAngle)
-
         commands = []
+        idxList = []
+
+        for i in range(lookAngleCnt):
+            idx = (
+                (zeroLED - floor(lookAngleCnt / 2)) + litCenterLed + i
+            ) % self._ledCount
+            idxList.append(idx)
+            if self._ledMirror[idx] == LedColor(0, 0, 0):
+                commands.append(SetLedState(idx, self._color))
+                self._ledMirror[idx] = self._color
+
+        for i, item in enumerate(self._ledMirror):
+            if i not in idxList and item != LedColor(0, 0, 0):
+                commands.append(SetLedState(i, LedColor(0, 0, 0)))
+                self._ledMirror[i] = LedColor(0, 0, 0)
+
         crcComp = 0
 
-        for _ in range(
-            floor(litCenterLed - (lookAngleCnt / 2)),
-        ):
-            crcComp = binascii.crc32(b'\x00\x00\x00', crcComp)
-
-        for i in range(
-            floor(litCenterLed - (lookAngleCnt / 2)),
-            floor(litCenterLed + (lookAngleCnt / 2)) + 1,
-        ):
-            colorBytes = self._color.to_bytes()
-            commands.append(SetLedState((i + zeroLED) % self._ledCount, self._color))
+        for led in self._ledMirror:
+            colorBytes = led.to_bytes()
             crcComp = binascii.crc32(colorBytes, crcComp)
-
-        for _ in range(floor(litCenterLed + (lookAngleCnt / 2)) + 1, self._ledCount):
-            crcComp = binascii.crc32(b'\x00\x00\x00', crcComp)
 
         return commands, crcComp
