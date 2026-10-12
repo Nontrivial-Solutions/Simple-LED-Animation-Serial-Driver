@@ -14,8 +14,9 @@ of LED. The LED are assumed to be NEOPIXEL and to be in a contiguous strip.
 
 #### Command Structure
 
-Each command in the serial client is indicated by a case-insensitive letter. Each command is then
-terminated with a newline character.
+Each command in the serial client is indicated by a case-insensitive letter. Following each command
+specifier is an ASCII string containing command specific data. The preferred data delimiter is `:`.
+Each command is then terminated with a newline character.
 
 > [!warning]
 >
@@ -27,9 +28,9 @@ terminated with a newline character.
 
 ###### Format
 
-|   0   |           1            |           2            |
-| :---: | :--------------------: | :--------------------: |
-|  ID   | Unsigned LED count LSB | Unsigned LED count MSB |
+|   0   |                           1                           |
+| :---: | :---------------------------------------------------: |
+|  ID   | Decimal ASCII representation of an unsigned long int. |
 
 ###### Description
 
@@ -37,20 +38,35 @@ The set state command reads
 
 ###### Response
 
-No response.
+No specific response.
 
 ##### Set State: `Ss`
 
 ###### Format
 
-|   0   |           1            |           2            |      3       |       4        |       5       |
-| :---: | :--------------------: | :--------------------: | :----------: | :------------: | :-----------: |
-|  ID   | Unsigned LED index LSB | Unsigned LED index MSB | Unsigned Red | Unsigned Green | Unsigned Blue |
+|   0   |                           1                           |   2   |                         3                         |   4   |                           5                           |   6   |                           7                           |
+| :---: | :---------------------------------------------------: | :---: | :-----------------------------------------------: | :---: | :---------------------------------------------------: | :---: | :---------------------------------------------------: |
+|  ID   | Decimal ASCII representation of an unsigned long int. |   :   | Decimal ASCII representation of an unsigned char. |   :   | Decimal ASCII representation of an unsigned long int. |   :   | Decimal ASCII representation of an unsigned long int. |
 
 ###### Description
 
-The set state command reads an index of an LED in the array and a color that LED should be. The LED
-is then commanded into that state.
+The set state command reads an index of an LED in the array and a color that LED should be.
+
+###### Response
+
+No specific response.
+
+##### Get CRC: `Rr`
+
+###### Format
+
+|   0   |
+| :---: |
+|  ID   |
+
+###### Description
+
+Request the CRC32 of the current LED array.
 
 ###### Response
 
@@ -77,7 +93,39 @@ The clear command sets each LED in the array to `#000000`.
 
 ###### Response
 
-No response.
+No specific response.
+
+##### Set Show: `Hh`
+
+###### Format
+
+|   0   |
+| :---: |
+|  ID   |
+
+###### Description
+
+Command the Arduino to update the LED array.
+
+###### Response
+
+No specific response.
+
+##### Set LED Array Off: `Zz`
+
+###### Format
+
+|   0   |
+| :---: |
+|  ID   |
+
+###### Description
+
+Command the Arduino to clear the LED array.
+
+###### Response
+
+No specific response.
 
 ## Unit Test Description
 
