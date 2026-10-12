@@ -1,15 +1,14 @@
 """Base class for an LED animation driver."""
 
-import time
 from time import sleep
 
-import serial
 from serial import Serial
 
 from slasd.commands.support import LedColor
 
-from .commands.noResp import SetLedCount, SetLedOff
-from .commands.withResp import SetLedState
+from .commands.noResp import CmdShow, SetLedCount, SetLedOff, SetLedState
+from .commands.support import ACK_STR
+from .commands.withResp import GetCrc
 
 
 class LedAnimationDevice:
@@ -35,6 +34,9 @@ class LedAnimationDevice:
     _color : LedColor
         The color of a lit LED.
 
+    _ledMirror: list[LedColor]
+        A mirror of the LED array used for computing CRC32.
+
     """
 
     _ser: Serial | None
@@ -43,15 +45,16 @@ class LedAnimationDevice:
     _timeout: int
     _ledCount: int
     _color: LedColor
+    _ledMirror: list[LedColor]
 
     def __init__(
         self,
-        COMport: str = 'COM1',
+        COMport: str = 'COM4',
         baud: int = 9600,
         timeout: int = 1,
         ledCount: int = 1000,
         setup: bool = True,
-        color: LedColor = LedColor(red=0, blue=0, green=0),
+        color: LedColor | None = None,
     ) -> None:
         """Construct a LedAnimationDevice class.
 
@@ -76,12 +79,16 @@ class LedAnimationDevice:
             The color to command a lit LED to be.
 
         """
+        if color is None:
+            color = LedColor(red=0, blue=0, green=0)
+
         self._ser = None
         self._COMport = COMport
         self._baud = baud
         self._timeout = timeout
         self._ledCount = ledCount
         self._color = color
+
         if setup:
             self.connect()
 
@@ -93,11 +100,13 @@ class LedAnimationDevice:
         else:
             self._ser = Serial(self._COMport, self._baud, timeout=self._timeout)
             res = self._ser.readline()
-            while res != b'READY!\r\n':
+            while res[:-2] != ACK_STR:
                 res = self._ser.readline()
             self._ser.readline()
-            sleep(0.01)
+            sleep(0.1)
             SetLedCount(self._ledCount).send(self._ser)
+            sleep(0.1)
+            self._ledMirror = [LedColor(0, 0, 0)] * self._ledCount
 
     def _computeState(self, **kwargs) -> tuple[list[SetLedState], int]:
         """State computation interface.
@@ -138,11 +147,13 @@ class LedAnimationDevice:
 
         commands, crc = self._computeState(**kwargs)
 
-        for command in commands[:-1]:
+        for command in commands:
             command.send(self._ser)
 
-        commands[-1].sendRespLine(self._ser)
-        crcFromDev = commands[-1].parsedResp()
+        crcFromDev = GetCrc()
+        crcFromDev.sendRespLine(self._ser)
 
-        if crc != crcFromDev:
+        if crc != crcFromDev.parsedResp():
+            print(crcFromDev._resp)
             raise Exception('an error occurred')  # TODO: Add specific Exception
+        CmdShow().send(self._ser)

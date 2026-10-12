@@ -1,9 +1,10 @@
 """Collection of serial command interfaces."""
 
-from time import sleep
 from typing import Protocol
 
 import serial
+
+from slasd.commands.support import ACK_STR
 
 
 class SerialCommand(Protocol):
@@ -15,13 +16,12 @@ class SerialCommand(Protocol):
         ID of the command. Usually a single ASCII char.
     _payload : bytearray
         Data payload to send with command.
-
     """
 
     _commandId: str
     _payload: bytearray
 
-    def send(self, ser: serial.Serial) -> None:
+    def send(self, ser: serial.Serial, ackCheck: bool = True) -> None:
         """Send a single serial command to the Arduino.
 
         Parameters
@@ -33,6 +33,12 @@ class SerialCommand(Protocol):
         """
         cmdBytes = bytes(self._commandId, 'ASCII')
         ser.write(cmdBytes + self._payload)
+        ser.flush()
+        if ackCheck:
+            resp = ser.readline()
+            if resp[:-2] != ACK_STR:
+                print(resp)
+                raise Exception('an error occurred')  # TODO: Add specific Exception
 
 
 class SerialCommandWithResponse(SerialCommand):
@@ -68,10 +74,8 @@ class SerialCommandWithResponse(SerialCommand):
 
 
         """
-        self.send(ser)
+        self.send(ser, ackCheck=False)
         self._resp = ser.readline()
-        while self._resp == b'':
-            self._resp = ser.readline()
         return self._resp
 
     def sendResp(self, ser: serial.Serial) -> bytes:
@@ -89,6 +93,6 @@ class SerialCommandWithResponse(SerialCommand):
 
 
         """
-        self.send(ser)
+        self.send(ser, ackCheck=False)
         self._resp = ser.read(self._readLen)
         return self._resp

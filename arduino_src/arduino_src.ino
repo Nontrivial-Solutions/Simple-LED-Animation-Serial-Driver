@@ -1,11 +1,11 @@
 /**
  * \file arduino_src.ino
- * \brief Arduino project for basic control of a string of LED.
+ * \brief Arduino project for basic control of a string/array of LED.
  */
-
 
 #include "FastLED.h"
 #include <CRC32.h>
+#include <stdio.h>
 
 /*************************************************************************************************/
 /************************** Defines **************************************************************/
@@ -16,12 +16,32 @@
  * \brief The size the LED array. Bounded by memory size of the uc in relation to serial buffer
  *needs.
  */
-#define MAX_NUM_LEDS 1000u
+#define MAX_NUM_LEDS (1000u)
 
 /**
  * \brief Physical pin the LED are connected to.
  */
-#define DATA_PIN 6
+#define DATA_PIN (6u)
+
+/**
+ * \brief Specify the ringbuffer size for the hardware monitor. The arduino default is 64bytes.
+ */
+#define SERIAL_BUFFER_SIZE (64u)
+
+/**
+ * \brief Specify the string to send as acknowledgement to a message with no explicit reply.
+ */
+#define ACK_STR ("ACK")
+
+/**
+ * \brief Return status when a command is processed correctly.
+ */
+#define RET_STA_VALID (0u)
+
+/**
+ * \brief Return status when a command is processed incorrectly.
+ */
+#define RET_STA_INVALID (1u)
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -31,41 +51,42 @@
  * \typedef cmd_handler_funptr_t
  * \brief Function pointer type for a command handler callback function.
  */
-typedef uint8_t (*cmd_handler_funptr_t)();
+typedef uint8_t (*cmdHandlerFunptr_t)();
 
 /**
- * \struct cmd_dic_t
+ * \struct cmdDic_t
  * \brief The storage type for a serial command.
  *
  */
-typedef struct cmd_dic_t {
-  char *char_class;            /**< The class of char that indicate a command.*/
-  cmd_handler_funptr_t funptr; /**< The callback used to process the command.*/
-} cmd_dic_t;
-
-/**
- * \struct color_t
- * \brief The storage type for a color tuple.
- *
- */
-typedef struct color_t {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-} color_t;
+typedef struct cmdDic_t {
+  char *charClass;           /**< The class of char that indicate a command.*/
+  cmdHandlerFunptr_t funptr; /**< The callback used to process the command.*/
+} cmdDic_t;
 
 /*************************************************************************************************/
 /************************** Private Function Declarations ****************************************/
 /*************************************************************************************************/
 
-uint8_t set_led_state_cmd();
-uint8_t set_led_off_cmd();
-uint8_t set_led_count_cmd();
-bool cmd_check_charset(const char *valid_chars, const char str_char);
-uint32_t checksum(uint16_t count);
-bool readUint16(uint16_t *val);
-bool readColor(color_t *color);
-void clearIBuff();
+/* Documentation in declaration.*/
+uint8_t setLedStateCmd();
+
+/* Documentation in declaration.*/
+uint8_t setLedOffCmd();
+
+/* Documentation in declaration.*/
+uint8_t setLedCountCmd();
+
+/* Documentation in declaration.*/
+uint8_t procShowCmd();
+
+/* Documentation in declaration.*/
+uint8_t getCrcCmd();
+
+/* Documentation in declaration.*/
+bool cmdCheckCharset(const char *validChars, const char strChar);
+
+/* Documentation in declaration.*/
+uint32_t getChecksum(uint16_t count);
 
 /*************************************************************************************************/
 /************************** Local Variables ******************************************************/
@@ -79,58 +100,103 @@ CRGB leds[MAX_NUM_LEDS];
 /**
  * \brief The collection of LED objects.
  */
-uint16_t ledCount = 0;
+char serialBuffer[SERIAL_BUFFER_SIZE];
+
+/**
+ * \brief The collection of LED objects.
+ */
+unsigned long int ledCount = 0;
+
+/**
+ * \brief The checksum for the LED array. Global so it can be computed in the main loop.
+ */
+uint32_t ledArrayCsum = 0;
 
 /**
  * \brief The state command template.
  */
-cmd_dic_t setState = { "Ss", &set_led_state_cmd };
+cmdDic_t setState = { "Ss", &setLedStateCmd };
 
-cmd_dic_t setCount = { "Cc", &set_led_count_cmd };
+/**
+ * \brief The count command template.
+ */
+cmdDic_t setCount = { "Cc", &setLedCountCmd };
+
+/**
+ * \brief The show command template.
+ */
+cmdDic_t procShow = { "Hh", &procShowCmd };
+
+/**
+ * \brief The get CRC command template.
+ */
+cmdDic_t getCrc = { "Rr", &getCrcCmd };
 
 /**
  * \brief The off command template.
  */
-cmd_dic_t setOff = { "Oo", &set_led_off_cmd };
+cmdDic_t setOff = { "Oo", &setLedOffCmd };
 
 /**
  * \brief The collection of commands. Must be NULL terminated.
  */
-const cmd_dic_t *charcheck_dict[] = { &setState, &setOff, &setCount, NULL };
+const cmdDic_t *charcheck_dict[] = { &setState, &setOff, &setCount, &procShow, &getCrc, NULL };
+
 
 /*************************************************************************************************/
 /************************** Primary Arduino Event Loop *******************************************/
 /*************************************************************************************************/
-uint8_t pinstate = HIGH;
 void setup() {
   /* initialize serial: */
   Serial.begin(9600);
+  Serial.setTimeout(10);
   while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
+    ;
   }
-  FastLED.addLeds< NEOPIXEL, DATA_PIN >(leds, MAX_NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, MAX_NUM_LEDS);
   ledCount = 0u;
-  set_led_off_cmd();
-  clearIBuff();
-  Serial.println("READY!");
+  setLedOffCmd();
+  Serial.println(ACK_STR);
   Serial.flush();
 }
+
 void loop() {
   if (Serial.available() > 0) {
-    uint8_t curChar = Serial.read();
     size_t i;
-    for (i = 0; charcheck_dict[i] != NULL; i++) {
-      const cmd_dic_t *dic_p = charcheck_dict[i];
-      if (cmd_check_charset(dic_p->char_class, curChar)) {
-        if (dic_p->funptr != NULL) {
-          dic_p->funptr();
+    /* Read until newline, leaving room for the null-terminator */
+    int bytesRead = Serial.readBytesUntil('\n', serialBuffer, SERIAL_BUFFER_SIZE - 1);
+
+    /* Error Handling: Check for buffer overflow */
+    if (bytesRead == SERIAL_BUFFER_SIZE - 1) {
+      Serial.println(F("ERROR: Buffer overflow. Input exceeded 63 chars."));
+      Serial.flush();
+      /* Flush the remaining garbage out of the hardware buffer */
+      while (Serial.available() > 0) {
+        Serial.read();
+      }
+      return;
+    } else {
+      /* Null-terminate the string so standard C string functions work safely */
+      serialBuffer[bytesRead] = '\0';
+
+      /* Strip trailing carriage returns (Windows Serial Monitor sends \r\n) */
+      if (bytesRead > 0 && serialBuffer[bytesRead - 1] == '\r') {
+        serialBuffer[bytesRead - 1] = '\0';
+      }
+
+      /* Process the validated input */
+      for (i = 0; charcheck_dict[i] != NULL; i++) {
+        const cmdDic_t *dic_p = charcheck_dict[i];
+        if (cmdCheckCharset(dic_p->charClass, serialBuffer[0])) {
+          if (dic_p->funptr != NULL) {
+            dic_p->funptr();
+          }
+          break;
         }
-        break;
       }
     }
+    ledArrayCsum = getChecksum(ledCount);
   }
-  FastLED.show();
-  delay(500);
 }
 
 /*************************************************************************************************/
@@ -140,51 +206,113 @@ void loop() {
 /**
  * \brief Callback function for the state command.
  *
- * \return not used
+ * Set the state of an individual LED in the array.
+ *
+ * \return The status of the command processing.
  */
-uint8_t set_led_state_cmd() {
-  uint16_t idx;
-  color_t color;
-  readUint16(&idx);
-  if (idx >= ledCount) {
-    Serial.print("ERROR: idx out of range");
+uint8_t setLedStateCmd() {
+  unsigned long int idx = 0;
+  unsigned long int r = 0;
+  unsigned long int g = 0;
+  unsigned long int b = 0;
+
+  int res = sscanf(serialBuffer, "S%ld:%ld:%ld:%ld\n", &idx, &r, &g, &b);
+
+  if ((r > 0xff) || (g > 0xff) || (b > 0xff) || (res != 4) || (idx >= ledCount)) {
+    Serial.print("ERROR: while setting LED state -- red: ");
+    Serial.print(r);
+    Serial.print(" -- green: ");
+    Serial.print(g);
+    Serial.print(" -- blue: ");
+    Serial.print(b);
+    Serial.print(" -- idx: ");
+    Serial.print(idx);
+    Serial.print(" -- sscanf: ");
+    Serial.print(res);
+    Serial.print(" -- buffer: ");
+    Serial.print(serialBuffer);
+    Serial.print(" -- count: ");
     Serial.println(ledCount);
+    Serial.flush();
+    return RET_STA_INVALID;
   }
-  readColor(&color);
-  leds[idx].red = color.red;
-  leds[idx].green = color.green;
-  leds[idx].blue = color.blue;
-  Serial.println(checksum(ledCount));
-  return 0;
+  leds[idx].red = (uint8_t)r;
+  leds[idx].green = (uint8_t)g;
+  leds[idx].blue = (uint8_t)b;
+  Serial.println(ACK_STR);
+  return RET_STA_VALID;
 }
 
 /**
- * \brief Callback function for the state command.
+ * \brief Callback function for the LED count command.
  *
- * \return not used
+ * Set the number of LED in the array.
+ *
+ * \return The status of the command processing.
  */
-uint8_t set_led_count_cmd() {
-  readUint16(&ledCount);
-  if (MAX_NUM_LEDS < ledCount) {
-    Serial.print(" ERROR: to many LED ");
+uint8_t setLedCountCmd() {
+  unsigned long int tcount;
+
+  int res = sscanf(serialBuffer, "C%ld", &tcount);
+
+  if ((res != 1) || (tcount > MAX_NUM_LEDS)) {
+    Serial.print("ERROR: while setting LED count -- sscanf: ");
+    Serial.print(res);
+    Serial.print(" -- temp count: ");
+    Serial.print(tcount);
+    Serial.print(" -- count: ");
     Serial.println(ledCount);
+    Serial.flush();
+    return RET_STA_INVALID;
   }
-  return 0;
+  ledCount = tcount;
+  Serial.println(ACK_STR);
+  return RET_STA_VALID;
 }
 
 /**
- * \brief Callback function for the state command.
+ * \brief Callback function for the off command.
  *
- * \return not used
+ * Set the entire array off.
+ *
+ * \return The status of the command processing.
  */
-uint8_t set_led_off_cmd() {
+uint8_t setLedOffCmd() {
   size_t i;
+
   for (i = 0; i < MAX_NUM_LEDS; i++) {
-    leds[i].r = 0;
-    leds[i].g = 0;
-    leds[i].b = 0;
+    leds[i].r = (uint8_t)0u;
+    leds[i].g = (uint8_t)0u;
+    leds[i].b = (uint8_t)0u;
   }
-  return 0;
+  Serial.println(ACK_STR);
+  return RET_STA_VALID;
+}
+
+/**
+ * \brief Callback function for the LED array show command.
+ *
+ * Command the array to update to show the current state.
+ *
+ * \return The status of the command processing.
+ */
+uint8_t procShowCmd() {
+  FastLED.show();
+  Serial.println(ACK_STR);
+  return RET_STA_VALID;
+}
+
+/**
+ * \brief Callback function for the CRC command.
+ *
+ * Get the array CRC from the device.
+ *
+ * \return The status of the command processing.
+ */
+uint8_t getCrcCmd() {
+  Serial.println(ledArrayCsum);
+  Serial.flush();
+  return RET_STA_VALID;
 }
 
 /**
@@ -194,7 +322,7 @@ uint8_t set_led_off_cmd() {
  * \param str_char The char indicating what command to process.
  * \return True when command is found. False otherwise.
  */
-bool cmd_check_charset(const char *valid_chars, const char str_char) {
+bool cmdCheckCharset(const char *valid_chars, const char str_char) {
   bool retval = false;
   size_t i;
 
@@ -207,46 +335,19 @@ bool cmd_check_charset(const char *valid_chars, const char str_char) {
   return retval;
 }
 
-bool readColor(color_t *color) {
-  bool retval = false;
-  if (3 <= Serial.available()) {
-    color->red = Serial.read();
-    color->green = Serial.read();
-    color->blue = Serial.read();
-    retval = true;
-  }
-  return retval;
-}
-
-bool readUint16(uint16_t *val) {
-  bool retval = false;
-
-  if (2 <= Serial.available()) {
-    uint8_t lower = Serial.read();
-    uint8_t upper = Serial.read();
-    *val = upper;
-    *val <<= 8;
-    *val |= lower;
-    retval = true;
-  }
-
-  return retval;
-}
-
-uint32_t checksum(uint16_t count) {
+/**
+ * \brief Compute the CRC32 for the color byte values of the LED array.
+ *
+ * \return The current CRC32 for the LED array.
+ */
+uint32_t getChecksum(uint16_t count) {
   CRC32 crc;
   size_t i;
+
   for (i = 0; i < count; i++) {
-    crc.add(leds[i].r);
-    crc.add(leds[i].g);
-    crc.add(leds[i].b);
+    crc.add(leds[i].red);
+    crc.add(leds[i].green);
+    crc.add(leds[i].blue);
   }
   return crc.calc();
-}
-
-
-void clearIBuff() {
-  while (Serial.available() > 0) {
-    Serial.read();
-  }
 }
