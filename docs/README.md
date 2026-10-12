@@ -274,9 +274,24 @@ classDiagram
         + int colorB
     }
 
+    class SetLedCount{
+        + init(count) 
+    }
+    
+    class CmdShow{
+        + init() 
+    }
 
+    class setLedOff{
+        + init() 
+    }
+    
     class SetLedState {
-        + init(self, data) 
+        + init(idx, color) 
+    }
+    
+    class GetCrc{
+        + init() 
     }
     
     class SerialCommand {
@@ -285,13 +300,30 @@ classDiagram
         - bytearray payload
         + send(ser) 
     }
+    
+    class SerialCommandWithResponse {
+        <<interface>>
+        - sendResp(ser)
+        - sendRespLine(ser)
+        + parsedResp() 
+    }
 
     SetLedState ..|> SerialCommand
+    CmdShow ..|> SerialCommand
+    setLedOff ..|> SerialCommand
+    SetLedCount ..|> SerialCommand
+    GetCrc ..|> SerialCommandWithResponse
+    SerialCommand ..|> SerialCommandWithResponse
 
     FastrakAnimationDevice --|> LedAnimationDevice
 
     FastrakParams --* FastrakAnimationDevice 
     SetLedState --* LedAnimationDevice 
+    SetLedState --* LedAnimationDevice 
+    CmdShow --* LedAnimationDevice 
+    setLedOff --* LedAnimationDevice 
+    SetLedCount --* LedAnimationDevice 
+    GetCrc --* LedAnimationDevice 
 
 ```
 
