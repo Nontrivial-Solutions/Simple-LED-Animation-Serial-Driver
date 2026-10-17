@@ -14,7 +14,7 @@ LED_IDX = 874
 LED_COLOR = 126
 if __name__ == '__main__':
     COMport = '/dev/ttyACM0'
-    ser = Serial(port=COMport, baudrate=9600, timeout=1)
+    ser = Serial(port=COMport, baudrate=115200, timeout=1)
     res = ser.readline()
     while res[:-2] != ACK_STR:
         res = ser.readline()

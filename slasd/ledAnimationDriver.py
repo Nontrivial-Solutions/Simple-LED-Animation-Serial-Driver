@@ -1,5 +1,6 @@
 """Base class for an LED animation driver."""
 
+import binascii
 from time import sleep
 
 from serial import Serial
@@ -108,7 +109,23 @@ class LedAnimationDevice:
             sleep(0.1)
             self._ledMirror = [LedColor(0, 0, 0)] * self._ledCount
 
-    def _computeState(self, **kwargs) -> tuple[list[SetLedState], int]:
+    def _compCrc(self) -> int:
+        """Compute the CRC32 of the led array mirror.
+
+        Returns
+        -------
+        int
+            The [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
+            state of the LED array.
+        """
+        crcComp = 0
+
+        for led in self._ledMirror:
+            colorBytes = led.to_bytes()
+            crcComp = binascii.crc32(colorBytes, crcComp)
+        return crcComp
+
+    def _computeState(self, **kwargs) -> list[SetLedState]:
         """State computation interface.
 
         Parameters
@@ -119,10 +136,8 @@ class LedAnimationDevice:
 
         Returns
         -------
-        tuple[list[SetLedState], int]
-            A tuple containing first a collection of commands to send (in order) to the Arduino.
-            Second the [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
-            state of the LED array.
+        list[SetLedState]
+            The collection of commands to send (in order) to the Arduino.
         """
         raise NotImplementedError
 
@@ -130,8 +145,16 @@ class LedAnimationDevice:
         """Set the LED array off."""
         if self._ser is None:
             raise TypeError
-
         SetLedOff().send(self._ser)
+        self._ledMirror = [LedColor(0, 0, 0)] * self._ledCount
+
+        crcFromDev = GetCrc()
+        crcFromDev.sendRespLine(self._ser)
+
+        if self._compCrc() != crcFromDev.parsedResp():
+            print(crcFromDev._resp)
+            raise Exception('an error occurred')  # TODO: Add specific Exception
+        CmdShow().send(self._ser)
 
     def compNSndState(self, **kwargs) -> None:
         """Compute and set the state of the LED array.
@@ -145,7 +168,7 @@ class LedAnimationDevice:
         if self._ser is None:
             raise TypeError
 
-        commands, crc = self._computeState(**kwargs)
+        commands = self._computeState(**kwargs)
 
         for command in commands:
             command.send(self._ser)
@@ -153,7 +176,7 @@ class LedAnimationDevice:
         crcFromDev = GetCrc()
         crcFromDev.sendRespLine(self._ser)
 
-        if crc != crcFromDev.parsedResp():
+        if self._compCrc() != crcFromDev.parsedResp():
             print(crcFromDev._resp)
             raise Exception('an error occurred')  # TODO: Add specific Exception
         CmdShow().send(self._ser)

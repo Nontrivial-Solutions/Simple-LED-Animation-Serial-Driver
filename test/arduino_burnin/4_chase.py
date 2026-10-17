@@ -11,7 +11,7 @@ if __name__ == '__main__':
     COMport = '/dev/ttyACM0'
     print('init and connect')
     col = LedColor(red=LED_COLOR, green=LED_COLOR, blue=LED_COLOR)
-    fad = FastrakAnimationDevice(COMport, ledCount=LED_COUNT, color=col)
+    fad = FastrakAnimationDevice(COMport, ledCount=LED_COUNT, baud=115200, color=col)
     for i in tqdm(range(1, LED_COUNT)):
         for j in tqdm(range(380), leave=False):
             ft = FastrakPostion(x=0, y=0, z=0, psi=i, theta=0, phi=0)

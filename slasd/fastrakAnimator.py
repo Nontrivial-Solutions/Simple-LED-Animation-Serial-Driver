@@ -1,6 +1,5 @@
 """Contains the Fastrak device angular illuminator class."""
 
-import binascii
 from math import floor
 from typing import TypedDict
 
@@ -145,9 +144,7 @@ class FastrakAnimationDevice(LedAnimationDevice):
             color=color,
         )
 
-    def _computeState(
-        self, **kwargs: Unpack[FastrakParams]
-    ) -> tuple[list[SetLedState], int]:  # ty:ignore[invalid-method-override]
+    def _computeState(self, **kwargs: Unpack[FastrakParams]) -> list[SetLedState]:  # ty:ignore[invalid-method-override]
         """Compute the state array for the LED in the Fastrak look position use case.
 
         Parameters
@@ -157,10 +154,8 @@ class FastrakAnimationDevice(LedAnimationDevice):
 
         Returns
         -------
-        tuple[list[SetLedState], int]
-            A tuple containing first a collection of commands to send (in order) to the Arduino.
-            Second the [CRC32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of the new
-            state of the LED array.
+        list[SetLedState]
+            The collection of commands to send (in order) to the Arduino.
 
         """
         if (
@@ -196,10 +191,4 @@ class FastrakAnimationDevice(LedAnimationDevice):
                 commands.append(SetLedState(i, LedColor(0, 0, 0)))
                 self._ledMirror[i] = LedColor(0, 0, 0)
 
-        crcComp = 0
-
-        for led in self._ledMirror:
-            colorBytes = led.to_bytes()
-            crcComp = binascii.crc32(colorBytes, crcComp)
-
-        return commands, crcComp
+        return commands

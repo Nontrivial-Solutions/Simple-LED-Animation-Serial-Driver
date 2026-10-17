@@ -25,7 +25,7 @@ if __name__ == '__main__':
         '####################################################################################'
     )
 
-    ser = Serial(port=COMport, baudrate=9600, timeout=1)
+    ser = Serial(port=COMport, baudrate=115200, timeout=1)
     res = ser.readline()
     while res != b'ACK\r\n':
         res = ser.readline()
