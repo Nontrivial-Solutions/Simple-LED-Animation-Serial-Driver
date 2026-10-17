@@ -29,6 +29,11 @@
 #define SERIAL_BUFFER_SIZE (64u)
 
 /**
+ * \brief The baudrate to use for the serial connection.  
+ */
+#define SERIAL_BAUDRATE (115200u)
+
+/**
  * \brief Specify the string to send as acknowledgement to a message with no explicit reply.
  */
 #define ACK_STR ("ACK")
@@ -148,7 +153,7 @@ const cmdDic_t *charcheck_dict[] = { &setState, &setOff, &setCount, &procShow, &
 /*************************************************************************************************/
 void setup() {
   /* initialize serial: */
-  Serial.begin(9600);
+  Serial.begin(SERIAL_BAUDRATE);
   Serial.setTimeout(10);
   while (!Serial) {
     ;
@@ -240,6 +245,7 @@ uint8_t setLedStateCmd() {
   leds[idx].green = (uint8_t)g;
   leds[idx].blue = (uint8_t)b;
   Serial.println(ACK_STR);
+  Serial.flush();
   return RET_STA_VALID;
 }
 
@@ -267,6 +273,7 @@ uint8_t setLedCountCmd() {
   }
   ledCount = tcount;
   Serial.println(ACK_STR);
+  Serial.flush();
   return RET_STA_VALID;
 }
 
@@ -286,6 +293,7 @@ uint8_t setLedOffCmd() {
     leds[i].b = (uint8_t)0u;
   }
   Serial.println(ACK_STR);
+  Serial.flush();
   return RET_STA_VALID;
 }
 
@@ -299,6 +307,7 @@ uint8_t setLedOffCmd() {
 uint8_t procShowCmd() {
   FastLED.show();
   Serial.println(ACK_STR);
+  Serial.flush();
   return RET_STA_VALID;
 }
 
